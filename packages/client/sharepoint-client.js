@@ -458,10 +458,10 @@ export class SharePointClient {
 
         this.context.executeQueryAsync(
           () => {
+            const itemData = this._processItemData(newItem, listConfig);
             const result = {
               success: true,
-              id: newItem.get_id(),
-              title: newItem.get_item("Title"),
+              data: itemData,
               listName: listConfig.name,
               message: "Elemento creado exitosamente",
             };
@@ -867,11 +867,10 @@ export class SharePointClient {
 
         this.context.executeQueryAsync(
           () => {
+            const itemData = this._processItemData(item, listConfig);
             const result = {
               success: true,
-              item: item,
-              id: itemId,
-              title: item.get_item("Title"),
+              data: itemData,
               listName: listConfig.name,
               message: "Elemento actualizado exitosamente",
             };
@@ -935,6 +934,19 @@ export class SharePointClient {
       );
     }
 
+    // Obtener datos previos del elemento antes de eliminarlo
+    // para retornarlos al usuario (similar a como update retorna el estado)
+    const getResult = await this.getById(listConfig, itemId);
+    if (!getResult.success) {
+      return Promise.reject({
+        success: false,
+        error: `No se encontró el elemento con ID ${itemId}`,
+        listName: listConfig.name,
+      });
+    }
+
+    const previousItemData = getResult.item;
+
     return new Promise((resolve, reject) => {
       try {
         const list = this.web.get_lists().getByTitle(listConfig.name);
@@ -946,7 +958,7 @@ export class SharePointClient {
           () => {
             const result = {
               success: true,
-              id: itemId,
+              data: previousItemData,
               listName: listConfig.name,
               message: "Elemento eliminado exitosamente",
             };

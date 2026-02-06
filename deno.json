@@ -5,7 +5,7 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
   },
-  "workspaces": [
+  "workspace": [
     "packages/client",
     "packages/create-vite",
     "packages/vite-plugin"
