@@ -1,0 +1,4 @@
+{
+  "name": "@spark-sdk/client",
+  "exports": "./mod.ts"
+}
