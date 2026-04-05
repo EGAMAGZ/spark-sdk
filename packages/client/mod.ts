@@ -1,1 +1,1 @@
-export * from "./sharepoint-client.js";
+export * from './sharepoint-client.js';
