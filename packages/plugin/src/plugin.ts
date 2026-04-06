@@ -1,4 +1,4 @@
-import { type Plugin, type ResolvedConfig } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 import { convertHtmlToAspx } from '../src/template-converter.ts';
 
 export default function spark(): Plugin[] {
