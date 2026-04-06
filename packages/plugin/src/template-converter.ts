@@ -49,19 +49,15 @@ function getTagMatches(html: string, pattern: RegExp): string[] {
 }
 
 function extractExternalAssets(headHtml: string): ExternalAssets {
-  console.log(getTagMatches(
-    headHtml,
-    /<link[^>]+href="https?:\/\/[^"]*"[^>]*>/gi,
-  ));
   return {
     link: getTagMatches(
       headHtml,
-      /<link[^>]+href="https?:\/\/[^"]*"[^>]*>/gi,
-    ),
+      /<link[^>]+href="\/[^"]*"[^>]*>/gi,
+    ).map(tag => rewriteRelativeAttributes(tag, 'href', stripLeadingSlashes)),
     script: getTagMatches(
       headHtml,
-      /<script[^>]+src="https?:\/\/[^"]*"[^>]*><\/script>/gi,
-    ),
+      /<script[^>]+src="\/[^"]*"[^>]*><\/script>/gi,
+    ).map(tag => rewriteRelativeAttributes(tag, 'src', stripLeadingSlashes)),
     style: getTagMatches(
       headHtml,
       /<style[^>]*>[\s\S]*?<\/style>/gi,
