@@ -14,6 +14,15 @@ function stripLeadingSlashes(value: string): string {
   return value.replace(/^\/+/, '');
 }
 
+/**
+ * Rewrites matching attribute values in an HTML fragment when they are
+ * root-relative paths (start with `/`).
+ *
+ * @param html HTML fragment to rewrite.
+ * @param attribute Attribute name to rewrite (`href` or `src`).
+ * @param formatter Formatter applied to matched root-relative attribute values.
+ * @returns HTML fragment with rewritten attribute values.
+ */
 function rewriteRelativeAttributes(
   html: string,
   attribute: 'href' | 'src',
@@ -29,7 +38,15 @@ function rewriteRelativeAttributes(
     return `${attribute}="${formatter(value)}"`;
   });
 }
-
+/**
+ * Rewrites root-relative `src` and `href` URLs in body markup so they are
+ * compatible with generated ASPX output.
+ *
+ * `href` values ending in `.html` are converted to `.aspx`.
+ *
+ * @param html Body HTML content.
+ * @returns Rewritten body HTML content.
+ */
 function rewriteBodyUrls(html: string): string {
   const rewrittenSrcAttributes = rewriteRelativeAttributes(
     html,
@@ -44,20 +61,35 @@ function rewriteBodyUrls(html: string): string {
   );
 }
 
+/**
+ * Extracts full tag matches for a given regex pattern.
+ *
+ * @param html HTML source text.
+ * @param pattern Regular expression used to match complete tags.
+ * @returns Array of matched tag strings.
+ */
 function getTagMatches(html: string, pattern: RegExp): string[] {
-  return Array.from(html.matchAll(pattern), (match) => match[0]);
+  return Array.from(html.matchAll(pattern), (match) => match[0].trim());
 }
 
+/**
+ * Extracts root-relative external asset tags from the head section.
+ *
+ * Link and script source URLs are normalized by removing leading slashes.
+ *
+ * @param headHtml Raw `<head>` content.
+ * @returns Grouped external assets (`link`, `script`, and inline `style` tags).
+ */
 function extractExternalAssets(headHtml: string): ExternalAssets {
   return {
     link: getTagMatches(
       headHtml,
       /<link[^>]+href="\/[^"]*"[^>]*>/gi,
-    ).map(tag => rewriteRelativeAttributes(tag, 'href', stripLeadingSlashes)),
+    ).map((tag) => rewriteRelativeAttributes(tag, 'href', stripLeadingSlashes)),
     script: getTagMatches(
       headHtml,
       /<script[^>]+src="\/[^"]*"[^>]*><\/script>/gi,
-    ).map(tag => rewriteRelativeAttributes(tag, 'src', stripLeadingSlashes)),
+    ).map((tag) => rewriteRelativeAttributes(tag, 'src', stripLeadingSlashes)),
     style: getTagMatches(
       headHtml,
       /<style[^>]*>[\s\S]*?<\/style>/gi,
@@ -65,12 +97,24 @@ function extractExternalAssets(headHtml: string): ExternalAssets {
   };
 }
 
+/**
+ * Converts a full HTML document into a SharePoint-compatible ASPX page layout.
+ *
+ * The converter:
+ * - reads and rewrites body links/resources,
+ * - extracts supported assets from `<head>`,
+ * - injects SharePoint page directives and placeholders,
+ * - emits the final ASPX markup as a single string.
+ *
+ * @param html Full HTML document.
+ * @returns Generated ASPX content.
+ */
 export function convertHtmlToAspx(html: string): string {
-  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-  const bodyContent = bodyMatch ? bodyMatch[1].trim() : '';
+  const bodyMatch = getTagMatches(html, /<body[^>]*>([\s\S]*?)<\/body>/i);
+  const bodyContent = bodyMatch ? bodyMatch[1] : '';
   const rewrittenBody = rewriteBodyUrls(bodyContent);
 
-  const headMatch = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+  const headMatch = getTagMatches(html, /<head[^>]*>([\s\S]*?)<\/head>/i);
   const headContent = headMatch ? headMatch[1] : '';
   const extraHeadTags = extractExternalAssets(headContent);
 
