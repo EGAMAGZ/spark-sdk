@@ -110,11 +110,11 @@ function extractExternalAssets(headHtml: string): ExternalAssets {
  * @returns Generated ASPX content.
  */
 export function convertHtmlToAspx(html: string): string {
-  const bodyMatch = getTagMatches(html, /<body[^>]*>([\s\S]*?)<\/body>/i);
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   const bodyContent = bodyMatch ? bodyMatch[1] : '';
   const rewrittenBody = rewriteBodyUrls(bodyContent);
 
-  const headMatch = getTagMatches(html, /<head[^>]*>([\s\S]*?)<\/head>/i);
+  const headMatch = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
   const headContent = headMatch ? headMatch[1] : '';
   const extraHeadTags = extractExternalAssets(headContent);
 
