@@ -54,11 +54,13 @@ function rewriteBodyUrls(html: string): string {
     stripLeadingSlashes,
   );
 
-  return rewriteRelativeAttributes(
+  const rewrittenLocalHrefsLinks = rewriteRelativeAttributes(
     rewrittenSrcAttributes,
     'href',
     (value) => stripLeadingSlashes(value).replace(/\.html$/, '.aspx'),
   );
+
+  return rewrittenLocalHrefsLinks;
 }
 
 /**
@@ -84,11 +86,11 @@ function extractExternalAssets(headHtml: string): ExternalAssets {
   return {
     link: getTagMatches(
       headHtml,
-      /<link[^>]+href="\/[^"]*"[^>]*>/gi,
+      /<link[^>]+href="[^"]*"[^>]*>/gi,
     ).map((tag) => rewriteRelativeAttributes(tag, 'href', stripLeadingSlashes)),
     script: getTagMatches(
       headHtml,
-      /<script[^>]+src="\/[^"]*"[^>]*><\/script>/gi,
+      /<script[^>]+src="[^"]*"[^>]*><\/script>/gi,
     ).map((tag) => rewriteRelativeAttributes(tag, 'src', stripLeadingSlashes)),
     style: getTagMatches(
       headHtml,

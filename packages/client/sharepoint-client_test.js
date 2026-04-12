@@ -1,15 +1,6 @@
-import { afterEach, beforeEach, describe, it } from 'jsr:@std/testing/bdd';
-import {
-  assertEquals,
-  assertObjectMatch,
-  assertRejects,
-} from 'jsr:@std/assert';
-import {
-  assertSpyCall,
-  assertSpyCalls,
-  spy,
-  stub,
-} from 'jsr:@std/testing/mock';
+import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
+import { assertEquals, assertObjectMatch, assertRejects } from '@std/assert';
+import { assertSpyCalls, spy, stub } from '@std/testing/mock';
 import { ListConfigFactory, SharePointClient } from './sharepoint-client.js';
 
 describe('SharePointClient', () => {
