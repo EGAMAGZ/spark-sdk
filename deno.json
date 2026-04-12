@@ -20,5 +20,11 @@
     "rules": {
       "tags": ["recommended", "jsr", "workspace"]
     }
+  },
+  "publish": {
+    "exclude": [
+      "tests/",
+      ".github/"
+    ]
   }
 }
