@@ -1,1 +1,1 @@
-export * from "./sharepoint-client.js";
+export * from "./src/list-config.ts";
