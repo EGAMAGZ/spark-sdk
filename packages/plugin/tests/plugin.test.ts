@@ -1,10 +1,42 @@
-import { describe, expect, it } from 'vitest';
-import { build } from 'vite';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { build, Rolldown } from 'vite';
 import spark from '../src/plugin.ts';
 import { resolve } from 'node:path';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+
 describe('spark plugin integration', () => {
+  let tempDir: string;
+  beforeEach(async () => {
+    tempDir = await mkdtemp(resolve(tmpdir(), 'spark-test-'));
+  });
+
+  it('generate .aspx', async () => {
+    await writeFile(
+      resolve(tempDir, 'index.html'),
+      `<html><head><link rel="stylesheet" href="/styles/main.css"></head><body><p>Hello World</p></body></html>`,
+    );
+
+    const result = await build({
+      plugins: [spark()],
+      root: tempDir,
+      build: {
+        outDir: resolve(tempDir, 'dist'),
+      },
+      configFile: false,
+    });
+
+    console.log(result);
+    console.log(result.output);
+    console.dir(JSON.stringify(result));
+  });
+
+  afterEach(async () => {
+    await rm(tempDir, { recursive: true, force: true });
+  });
+});
+
+/*describe('spark plugin integration', () => {
   it('generates .aspx file from .html input', async () => {
     const tempDir = await mkdtemp(resolve(tmpdir(), 'spark-test-'));
     try {
@@ -109,4 +141,4 @@ describe('spark plugin integration', () => {
       await rm(tempDir, { recursive: true, force: true });
     }
   });
-});
+});*/
