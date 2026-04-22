@@ -4,16 +4,12 @@ export type ListFields<TFields extends Record<string, string>> =
   }
   & { title: "Title" };
 
-export type ListConfig<TFields extends Record<string, string>> = {
+export type SPList<TFields extends Record<string, string>> = {
   name: string;
   fields: ListFields<TFields>;
 };
 
-export type CustomFields = {
-  [column: string]: string;
-};
-
-export class ListConfigFactory {
+export class SPListBuilder {
   /**
    * Configuración personalizada
    * @param listName - Nombre de la lista
@@ -21,7 +17,7 @@ export class ListConfigFactory {
    * @returns Configuración de lista
    * @example
    * ```ts
-   * import { ListConfigFactory } from "@spark-sdk/client"
+   * import { SPListBuilder } from "@spark-sdk/client"
    * const taskListConfig = ListConfigFactory.createCustomConfig("Tasks", {
    *   description: "Description",
    *   status: "Status",
@@ -30,10 +26,10 @@ export class ListConfigFactory {
    *
    * ```
    */
-  static createCustomConfig<TFields extends Record<string, string>>(
+  static create<TFields extends Record<string, string>>(
     listName: string,
     customFields: TFields,
-  ): ListConfig<TFields> {
+  ): SPList<TFields> {
     return {
       name: listName,
       fields: {
