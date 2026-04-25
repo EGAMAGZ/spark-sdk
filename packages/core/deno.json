@@ -1,0 +1,4 @@
+{
+  "name": "@spark-sdk/core",
+  "exports": "./mod.ts"
+}
