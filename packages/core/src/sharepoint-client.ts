@@ -1,3 +1,5 @@
+import { validateListConfig } from "./list-config.ts";
+
 /**
  * Default headers for SharePoint API requests.
  */
@@ -984,44 +986,4 @@ export class ListConfigFactory {
       },
     };
   }
-}
-
-/**
- * Valida la configuración de una lista
- * @param {Object} config - Configuración de la lista a validar
- * @returns {Object} - { isValid: boolean, errorMessage: string }
- */
-function validateListConfig(config) {
-  if (!config || typeof config !== "object") {
-    return {
-      isValid: false,
-      errorMessage: "ListConfig es requerido y debe ser un objeto",
-    };
-  }
-
-  if (!config.name || typeof config.name !== "string") {
-    return {
-      isValid: false,
-      errorMessage: "ListConfig.name es requerido y debe ser un string",
-    };
-  }
-
-  if (!config.fields || typeof config.fields !== "object") {
-    return {
-      isValid: false,
-      errorMessage: "ListConfig.fields es requerido y debe ser un objeto",
-    };
-  }
-
-  if (!config.fields.title) {
-    return {
-      isValid: false,
-      errorMessage: "ListConfig.fields.title es requerido",
-    };
-  }
-
-  return {
-    isValid: true,
-    errorMessage: null,
-  };
 }

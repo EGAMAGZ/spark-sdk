@@ -62,3 +62,47 @@ export class SPListBuilder {
     };
   }
 }
+
+/**
+ * Valida la configuración de una lista
+ * @param list - Configuración de la lista a validar
+ * @returns Indica si la configuración es válida y un mensaje de error si no lo es
+ * @example
+ * ```ts
+ * import { SPListBuilder, validateSPList } from "@spark-sdk/client";
+ * const myList = SPListBuilder.create("My List", { customField: "CustomField" });
+ * const validation = validateSPList(myList);
+ * if (!validation.isValid) {
+ *   console.error(validation.errorMessage);
+ * }
+ * ```
+ */
+export function validateListConfig<TFields extends Record<string, string>>(
+  list: SPList<TFields>,
+): { isValid: boolean; errorMessage: string | null } {
+  if (!list.name || typeof list.name !== "string") {
+    return {
+      isValid: false,
+      errorMessage: "ListConfig.name es requerido y debe ser un string",
+    };
+  }
+
+  if (!list.fields || typeof list.fields !== "object") {
+    return {
+      isValid: false,
+      errorMessage: "ListConfig.fields es requerido y debe ser un objeto",
+    };
+  }
+
+  if (!list.fields.title) {
+    return {
+      isValid: false,
+      errorMessage: "ListConfig.fields.title es requerido",
+    };
+  }
+
+  return {
+    isValid: true,
+    errorMessage: null,
+  };
+}
