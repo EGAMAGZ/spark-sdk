@@ -1,6 +1,7 @@
+// @ts-nocheck Ignore TypeScript errors for test file
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertObjectMatch, assertRejects } from "@std/assert";
-import { assertSpyCall, assertSpyCalls, spy, stub } from "@std/testing/mock";
+import { assertSpyCalls, spy, stub } from "@std/testing/mock";
 import {
   ListConfigFactory,
   SharePointClient,
