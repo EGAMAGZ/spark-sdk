@@ -1,12 +1,4 @@
 /**
- * @module SharePointClient
- *
- * @description
- * SharePointClient - Clase Singleton para operaciones CRUD en listas de SharePoint
- * Solo maneja el contexto de SharePoint, las configuraciones de lista se pasan en cada operación
- */
-
-/**
  * Default headers for SharePoint API requests.
  */
 const DEFAULT_HEADERS = {
