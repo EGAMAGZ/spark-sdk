@@ -34,7 +34,8 @@ export class SharePointClient {
    * Obtiene la instancia singleton
    * @returns {SharePointClient} - Instancia única
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * ```
    */
@@ -49,7 +50,8 @@ export class SharePointClient {
    * Configura las opciones globales del cliente
    * @param {Object} newOptions - Nuevas opciones
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * client.setOptions({
    *   enableLogging: false,
@@ -64,7 +66,8 @@ export class SharePointClient {
    * Inicializa el cliente de SharePoint
    * @returns {Promise<SharePointClient>} - Promesa que resuelve con la instancia inicializada
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * try {
    *   await client.initialize();
@@ -359,7 +362,8 @@ export class SharePointClient {
    * Obtiene información del usuario actual
    * @returns {Object} - Información del usuario
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * await client.initialize();
    * const { user } = client.userInfo;
@@ -378,9 +382,10 @@ export class SharePointClient {
    * @param {Object} itemData - Datos del elemento a crear
    * @returns {Promise<Object>} - Resultado de la operación
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
-   * const taskListConfig = ListConfigFactory.createCustomConfig("Tasks", {
+   * const taskListConfig = SPListBuilder.create("Tasks", {
    *   description: "Description",
    *   status: "Status"
    * });
@@ -471,9 +476,10 @@ export class SharePointClient {
    * @param {Object} options - Opciones de consulta
    * @returns {Promise<Object>} - Elementos encontrados
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
-   * const taskListConfig = ListConfigFactory.createCustomConfig("Tasks", {
+   * const taskListConfig = SPListBuilder.create("Tasks", {
    *   description: "Description",
    *   status: "Status"
    * });
@@ -574,7 +580,7 @@ export class SharePointClient {
    * @example
    * ```js
    * const client = SharePointClient.getInstance();
-   * const autoListConfig = ListConfigFactory.createCustomConfig("Auto", {
+   * const autoListConfig = SPListBuilder.create("Auto", {
    *   placa: "Placa",        // fieldName: "placa" -> SharePoint field: "Placa"
    *   marca: "Marca",        // fieldName: "marca" -> SharePoint field: "Marca"
    *   modelo: "Modelo",      // fieldName: "modelo" -> SharePoint field: "Modelo"
@@ -741,9 +747,10 @@ export class SharePointClient {
    * @param {string[]} fields - Listado de campos a utilizar
    * @returns {Promise<Object>} - Elemento encontrado
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
-   * const taskListConfig = ListConfigFactory.createCustomConfig("Tasks", {
+   * const taskListConfig = SPListBuilder.create("Tasks", {
    *   description: "Description",
    *   status: "Status"
    * });
@@ -791,9 +798,10 @@ export class SharePointClient {
    * @param {Object} updateData - Datos a actualizar
    * @returns {Promise<Object>} - Resultado de la operación
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
-   * const taskListConfig = ListConfigFactory.createCustomConfig("Tasks", {
+   * const taskListConfig = SPListBuilder.create("Tasks", {
    *   status: "Status"
    * });
    *
@@ -881,9 +889,10 @@ export class SharePointClient {
    * @param {number} itemId - ID del elemento
    * @returns {Promise<Object>} - Resultado de la operación
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
-   * const taskListConfig = ListConfigFactory.createCustomConfig("Tasks", {});
+   * const taskListConfig = SPListBuilder.create("Tasks", {});
    *
    * try {
    *   const result = await client.delete(taskListConfig, 1);
@@ -959,31 +968,5 @@ export class SharePointClient {
         });
       }
     });
-  }
-}
-
-export class ListConfigFactory {
-  /**
-   * Configuración personalizada
-   * @param {string} listName - Nombre de la lista
-   * @param {Object} customFields - Campos personalizados
-   * @returns {Object} - Configuración de lista
-   * @example
-   * ```js
-   * const taskListConfig = ListConfigFactory.createCustomConfig("Tasks", {
-   *   description: "Description",
-   *   status: "Status",
-   *   dueDate: "DueDate"
-   * });
-   * ```
-   */
-  static createCustomConfig(listName, customFields) {
-    return {
-      name: listName,
-      fields: {
-        title: "Title",
-        ...customFields,
-      },
-    };
   }
 }

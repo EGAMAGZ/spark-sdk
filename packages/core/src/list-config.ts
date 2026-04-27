@@ -24,7 +24,7 @@ export type SPList<TFields extends Record<string, string>> = {
  * Provides a fluent API to construct SPList objects with custom fields.
  * @example
  * ```ts
- * import { SPListBuilder } from "@spark-sdk/client"
+ * import { SPListBuilder } from "@spark-sdk/core"
  *
  * const taskListConfig = SPListBuilder.create("Tasks", {
  *   description: "Description",
@@ -42,7 +42,7 @@ export class SPListBuilder {
    * @returns A new SPList configuration object
    * @example
    * ```ts
-   * import { SPListBuilder } from "@spark-sdk/client";
+   * import { SPListBuilder } from "@spark-sdk/core";
    * const myList = SPListBuilder.create("My List", {
    *   customField1: "Field1",
    *   customField2: "Field2"
@@ -69,7 +69,7 @@ export class SPListBuilder {
  * @returns Indica si la configuración es válida y un mensaje de error si no lo es
  * @example
  * ```ts
- * import { SPListBuilder, validateSPList } from "@spark-sdk/client";
+ * import { SPListBuilder, validateSPList } from "@spark-sdk/core";
  * const myList = SPListBuilder.create("My List", { customField: "CustomField" });
  * const validation = validateSPList(myList);
  * if (!validation.isValid) {
