@@ -9,9 +9,17 @@ const DEFAULT_HEADERS = {
   "Accept": "application/json;odata=verbose",
 };
 
+interface SharePointClientOptions {
+  enableLogging?: boolean;
+}
+
 export class SharePointClient {
   tty!: TTY;
   static _instance = null;
+
+  options: SharePointClientOptions = {
+    enableLogging: true,
+  };
 
   constructor() {
     if (SharePointClient._instance) {
@@ -23,10 +31,6 @@ export class SharePointClient {
     this.user = null;
     this.isInitialized = false;
     this.initializationPromise = null;
-
-    this.options = {
-      enableLogging: true,
-    };
 
     this.tty = new TTY({
       enabled: this.options.enableLogging,
@@ -64,7 +68,7 @@ export class SharePointClient {
    * });
    * ```
    */
-  setOptions(newOptions) {
+  setOptions(newOptions: SharePointClientOptions) {
     this.options = { ...this.options, ...newOptions };
     this.tty.log("Options updated", this.options);
   }
@@ -98,9 +102,8 @@ export class SharePointClient {
 
   /**
    * Performs the actual initialization
-   * @private
    */
-  async _performInitialization() {
+  private async _performInitialization() {
     try {
       this.tty.log("Initializing SharePoint context...");
 
@@ -126,9 +129,8 @@ export class SharePointClient {
 
   /**
    * Ensures the client is initialized
-   * @private
    */
-  async _ensureInitialized() {
+  private async _ensureInitialized() {
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -136,9 +138,8 @@ export class SharePointClient {
 
   /**
    * Initializes the SharePoint context
-   * @private
    */
-  _initializeSharePointContext() {
+  private _initializeSharePointContext() {
     return new Promise((resolve, reject) => {
       if (typeof SP === "undefined" || !SP.SOD) {
         reject(
@@ -189,9 +190,9 @@ export class SharePointClient {
 
   /**
    * Fetches current user data
-   * @private
+   * @param baseUrl - Base URL of the SharePoint site
    */
-  async _getUserData(baseUrl) {
+  private async _getUserData(baseUrl: string) {
     const url = new URL(baseUrl);
     url.pathname += "/_api/web/currentUser";
 
@@ -216,9 +217,8 @@ export class SharePointClient {
 
   /**
    * Processes field values for read/write operations
-   * @private
    */
-  _processFieldValue(value, isReading = false) {
+  private _processFieldValue(value, isReading = false) {
     if (value === null || value === undefined) {
       return null;
     }
@@ -241,9 +241,8 @@ export class SharePointClient {
 
   /**
    * Builds a CAML query
-   * @private
    */
-  _buildCamlQuery(options, listConfig) {
+  private _buildCamlQuery(options, listConfig) {
     const camlQuery = new SP.CamlQuery();
     let queryXml = "<View>";
 
@@ -298,9 +297,8 @@ export class SharePointClient {
 
   /**
    * Processes item data
-   * @private
    */
-  _processItemData(item, listConfig, requestedFields = null) {
+  private _processItemData(item, listConfig, requestedFields = null) {
     const itemData = {
       id: item.get_id(),
     };
