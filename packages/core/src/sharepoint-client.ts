@@ -1,5 +1,6 @@
 import { validateListConfig } from "./list-config.ts";
 import { TTY } from "./tty.ts";
+import { InvalidListConfigError } from "./exceptions.ts";
 
 /**
  * Default headers for SharePoint API requests.
@@ -42,7 +43,7 @@ export class SharePointClient {
 
   /**
    * Gets the singleton instance
-   * @returns {SharePointClient} - Unique instance
+   * @returns Unique instance
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -471,9 +472,8 @@ export class SharePointClient {
 
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
-      throw new Error(
-        "Invalid list configuration",
-        validateListConfig.errorMessage,
+      throw new InvalidListConfigError(
+        validatedConfig.errorMessage,
       );
     }
 
@@ -665,9 +665,8 @@ export class SharePointClient {
 
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
-      throw new Error(
-        "Invalid list configuration",
-        validateListConfig.errorMessage,
+      throw new InvalidListConfigError(
+        validatedConfig.errorMessage,
       );
     }
     const sharePointFieldName = listConfig.fields[fieldName];
@@ -790,9 +789,8 @@ export class SharePointClient {
 
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
-      throw new Error(
-        "Invalid list configuration",
-        validateListConfig.errorMessage,
+      throw new InvalidListConfigError(
+        validatedConfig.errorMessage,
       );
     }
 
@@ -875,9 +873,8 @@ export class SharePointClient {
 
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
-      throw new Error(
-        "Invalid list configuration",
-        validateListConfig.errorMessage,
+      throw new InvalidListConfigError(
+        validatedConfig.errorMessage,
       );
     }
 

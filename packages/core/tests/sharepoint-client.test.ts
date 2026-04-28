@@ -7,6 +7,7 @@ import {
   SharePointClient,
 } from "../src/sharepoint-client.ts";
 import { SPListBuilder } from "../src/list-config.ts";
+import { title } from "node:process";
 
 describe("SharePointClient", () => {
   let fetchStub;
@@ -399,6 +400,21 @@ describe("SharePointClient", () => {
     beforeEach(async () => {
       client = SharePointClient.getInstance();
       await client.initialize();
+    });
+
+    it("should handle invalid list configuration", async () => {
+      const invalidConfig = {
+        colums: {
+            status: "Status", 
+        },
+        title: "InvalidList",
+      }
+
+      try {
+        await client.read(invalidConfig);
+      } catch (e) {
+        assertEquals(e.name, "InvalidListConfigError");
+      }
     });
 
     it("should handle executeQueryAsync errors", async () => {
