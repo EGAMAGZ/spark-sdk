@@ -27,12 +27,12 @@ export class SharePointClient {
     };
 
     SharePointClient._instance = this;
-    this._log("SharePointClient Singleton creado");
+    this._log("SharePointClient Singleton created");
   }
 
   /**
-   * Obtiene la instancia singleton
-   * @returns {SharePointClient} - Instancia única
+   * Gets the singleton instance
+   * @returns {SharePointClient} - Unique instance
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -47,8 +47,8 @@ export class SharePointClient {
   }
 
   /**
-   * Configura las opciones globales del cliente
-   * @param {Object} newOptions - Nuevas opciones
+   * Sets global client options
+   * @param {Object} newOptions - New options
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -60,20 +60,20 @@ export class SharePointClient {
    */
   setOptions(newOptions) {
     this.options = { ...this.options, ...newOptions };
-    this._log("Opciones actualizadas", this.options);
+    this._log("Options updated", this.options);
   }
   /**
-   * Inicializa el cliente de SharePoint
-   * @returns {Promise<SharePointClient>} - Promesa que resuelve con la instancia inicializada
+   * Initializes the SharePoint client
+   * @returns {Promise<SharePointClient>} - Promise that resolves with the initialized instance
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * try {
    *   await client.initialize();
-   *   console.log("Cliente inicializado");
+   *   console.log("Client initialized");
    * } catch (error) {
-   *   console.error("Fallo en la inicialización", error);
+   *   console.error("Initialization failed", error);
    * }
    * ```
    */
@@ -91,12 +91,12 @@ export class SharePointClient {
   }
 
   /**
-   * Realiza la inicialización real
+   * Performs the actual initialization
    * @private
    */
   async _performInitialization() {
     try {
-      this._log("Inicializando contexto de SharePoint...");
+      this._log("Initializing SharePoint context...");
 
       const contextData = await this._initializeSharePointContext();
 
@@ -106,20 +106,20 @@ export class SharePointClient {
       this.user = contextData.user;
       this.isInitialized = true;
 
-      this._log("SharePoint Client inicializado exitosamente", {
+      this._log("SharePoint Client initialized successfully", {
         user: this.user?.LoginName,
       });
 
       return this;
     } catch (error) {
-      this._logError("Error durante la inicialización", error);
+      this._logError("Error during initialization", error);
       this.initializationPromise = null;
       throw error;
     }
   }
 
   /**
-   * Asegura que el cliente esté inicializado
+   * Ensures the client is initialized
    * @private
    */
   async _ensureInitialized() {
@@ -129,14 +129,14 @@ export class SharePointClient {
   }
 
   /**
-   * Inicializa el contexto de SharePoint
+   * Initializes the SharePoint context
    * @private
    */
   _initializeSharePointContext() {
     return new Promise((resolve, reject) => {
       if (typeof SP === "undefined" || !SP.SOD) {
         reject(
-          new Error("SharePoint JavaScript libraries no están disponibles"),
+          new Error("SharePoint JavaScript libraries are not available"),
         );
         return;
       }
@@ -159,7 +159,7 @@ export class SharePointClient {
 
               resolve({ current: context, site, web, user });
             } catch (error) {
-              this._logError("Error obteniendo datos del usuario", error);
+              this._logError("Error getting user data", error);
               reject(error);
             }
           };
@@ -168,7 +168,7 @@ export class SharePointClient {
             const error = new Error(
               `SharePoint context query failed: ${args.get_message()}`,
             );
-            this._logError("Fallo en query de contexto", error);
+            this._logError("Context query failed", error);
             reject(error);
           };
 
@@ -182,7 +182,7 @@ export class SharePointClient {
   }
 
   /**
-   * Obtiene datos del usuario actual
+   * Fetches current user data
    * @private
    */
   async _getUserData(baseUrl) {
@@ -209,7 +209,7 @@ export class SharePointClient {
   }
 
   /**
-   * Logger interno de la clase
+   * Internal logger for the class
    * @private
    */
   _log(message, data = null) {
@@ -226,7 +226,7 @@ export class SharePointClient {
   }
 
   /**
-   * Logger de errores
+   * Error logger
    * @private
    */
   _logError(message, error = null) {
@@ -243,7 +243,7 @@ export class SharePointClient {
   }
 
   /**
-   * Procesa valores de campo para escritura/lectura
+   * Processes field values for read/write operations
    * @private
    */
   _processFieldValue(value, isReading = false) {
@@ -251,14 +251,14 @@ export class SharePointClient {
       return null;
     }
 
-    // Si estamos leyendo y el valor tiene propiedades especiales de SP
+    // If reading and the value has SP special properties
     if (isReading && typeof value === "object") {
-      // Campo de usuario/persona
+      // User/Person field
       if (value.get_lookupValue) {
         return value.get_lookupValue();
       }
 
-      // Campo de fecha
+      // Date field
       if (value instanceof Date) {
         return value.toISOString();
       }
@@ -268,7 +268,7 @@ export class SharePointClient {
   }
 
   /**
-   * Construye una consulta CAML
+   * Builds a CAML query
    * @private
    */
   _buildCamlQuery(options, listConfig) {
@@ -325,7 +325,7 @@ export class SharePointClient {
   }
 
   /**
-   * Procesa los datos de un elemento
+   * Processes item data
    * @private
    */
   _processItemData(item, listConfig, requestedFields = null) {
@@ -346,9 +346,7 @@ export class SharePointClient {
           itemData[key] = this._processFieldValue(fieldValue, true);
         } catch (error) {
           this._log(
-            `Campo '${key}' (${
-              listConfig.fields[key]
-            }) no disponible en el item`,
+            `Field '${key}' (${listConfig.fields[key]}) not available in item`,
             error.message,
           );
         }
@@ -359,8 +357,8 @@ export class SharePointClient {
   }
 
   /**
-   * Obtiene información del usuario actual
-   * @returns {Object} - Información del usuario
+   * Gets current user information
+   * @returns {Object} - User information
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -377,10 +375,10 @@ export class SharePointClient {
   }
 
   /**
-   * Crea un nuevo elemento en la lista especificada
-   * @param {Object} listConfig - Configuración de la lista
-   * @param {Object} itemData - Datos del elemento a crear
-   * @returns {Promise<Object>} - Resultado de la operación
+   * Creates a new item in the specified list
+   * @param {Object} listConfig - List configuration
+   * @param {Object} itemData - Item data to create
+   * @returns {Promise<Object>} - Operation result
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -391,16 +389,16 @@ export class SharePointClient {
    * });
    *
    * const newItem = {
-   *   title: "Nueva Tarea",
-   *   description: "Descripción de la nueva tarea",
-   *   status: "Pendiente"
+   *   title: "New Task",
+   *   description: "Description of the new task",
+   *   status: "Pending"
    * };
    *
    * try {
    *   const result = await client.create(taskListConfig, newItem);
-   *   console.log("Elemento creado:", result);
+   *   console.log("Item created:", result);
    * } catch (error) {
-   *   console.error("Error creando elemento:", error);
+   *   console.error("Error creating item:", error);
    * }
    * ```
    */
@@ -410,7 +408,7 @@ export class SharePointClient {
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
       throw new Error(
-        "Configuración de lista inválida",
+        "Invalid list configuration",
         validateListConfig.errorMessage,
       );
     }
@@ -439,10 +437,10 @@ export class SharePointClient {
               success: true,
               data: itemData,
               listName: listConfig.name,
-              message: "Elemento creado exitosamente",
+              message: "Item created successfully",
             };
 
-            this._log(`Elemento creado en ${listConfig.name}`, result);
+            this._log(`Item created in ${listConfig.name}`, result);
             resolve(result);
           },
           (_sender, args) => {
@@ -454,14 +452,14 @@ export class SharePointClient {
             };
 
             this._logError(
-              `Error al crear elemento en ${listConfig.name}`,
+              `Error creating item in ${listConfig.name}`,
               error,
             );
             reject(error);
           },
         );
       } catch (error) {
-        this._logError("Error en método create", error);
+        this._logError("Error in create method", error);
         reject({
           success: false,
           error: error.message,
@@ -471,10 +469,10 @@ export class SharePointClient {
   }
 
   /**
-   * Lee elementos de la lista actual o especificada
-   * @param {Object} listConfig - Configuración de la lista
-   * @param {Object} options - Opciones de consulta
-   * @returns {Promise<Object>} - Elementos encontrados
+   * Reads items from the current or specified list
+   * @param {Object} listConfig - List configuration
+   * @param {Object} options - Query options
+   * @returns {Promise<Object>} - Found items
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -484,13 +482,13 @@ export class SharePointClient {
    *   status: "Status"
    * });
    *
-   * // Leer todos los items
+   * // Read all items
    * const allItems = await client.read(taskListConfig);
    *
-   * // Leer con opciones
+   * // Read with options
    * const options = {
    *   fields: ["title", "status"],
-   *   filter: `<Eq><FieldRef Name='Status' /><Value Type='Text'>Pendiente</Value></Eq>`,
+   *   filter: `<Eq><FieldRef Name='Status' /><Value Type='Text'>Pending</Value></Eq>`,
    *   orderBy: { field: "Title", ascending: true },
    *   rowLimit: 10
    * };
@@ -504,7 +502,7 @@ export class SharePointClient {
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
       throw new Error(
-        "Configuración de lista inválida",
+        "Invalid list configuration",
         validateListConfig.errorMessage,
       );
     }
@@ -539,7 +537,7 @@ export class SharePointClient {
             };
 
             this._log(
-              `Se obtuvieron ${itemsArray.length} elementos de ${listConfig.name}`,
+              `Retrieved ${itemsArray.length} items from ${listConfig.name}`,
             );
             resolve(result);
           },
@@ -552,14 +550,14 @@ export class SharePointClient {
             };
 
             this._logError(
-              `Error al leer elementos de ${listConfig.name}`,
+              `Error reading items from ${listConfig.name}`,
               error,
             );
             reject(error);
           },
         );
       } catch (error) {
-        this._logError("Error en método read", error);
+        this._logError("Error in read method", error);
         reject({
           success: false,
           error: error.message,
@@ -569,121 +567,121 @@ export class SharePointClient {
   }
 
   /**
-   * Busca elementos por campo específico usando operadores CAML
-   * @param {Object} listConfig - Configuración de la lista
-   * @param {string} fieldName - Nombre del campo (usar clave de configuración, ej: "placa")
-   * @param {string|number|boolean|Date} searchValue - Valor a buscar
-   * @param {string} operator - Operador de comparación CAML (por defecto: "Contains")
-   * @param {string[]} fields - Listado de campos a utilizar
-   * @returns {Promise<Object>} - Elementos encontrados
+   * Searches items by specific field using CAML operators
+   * @param {Object} listConfig - List configuration
+   * @param {string} fieldName - Field name (use config key, e.g., "placa")
+   * @param {string|number|boolean|Date} searchValue - Value to search
+   * @param {string} operator - CAML comparison operator (default: "Contains")
+   * @param {string[]} fields - List of fields to use
+   * @returns {Promise<Object>} - Found items
    *
    * @example
    * ```js
    * const client = SharePointClient.getInstance();
    * const autoListConfig = SPListBuilder.create("Auto", {
-   *   placa: "Placa",        // fieldName: "placa" -> SharePoint field: "Placa"
-   *   marca: "Marca",        // fieldName: "marca" -> SharePoint field: "Marca"
-   *   modelo: "Modelo",      // fieldName: "modelo" -> SharePoint field: "Modelo"
-   *   activo: "Activo",      // fieldName: "activo" -> SharePoint field: "Activo"
-   *   fecha: "FechaRegistro" // fieldName: "fecha" -> SharePoint field: "FechaRegistro"
+   *   placa: "Placa",
+   *   marca: "Marca",
+   *   modelo: "Modelo",
+   *   activo: "Activo",
+   *   fecha: "FechaRegistro"
    * });
    *
-   * // ========== OPERADORES DE COMPARACIÓN ==========
+   * // ========== COMPARISON OPERATORS ==========
    *
-   * // 1. Eq (Igual a)
+   * // 1. Eq (Equal to)
    * const exactMatch = await client.search(autoListConfig, "placa", "ABC123", "Eq");
-   * // CAML generado: <Eq><FieldRef Name="Placa" /><Value Type="Text">ABC123</Value></Eq>
+   * // Generated CAML: <Eq><FieldRef Name="Placa" /><Value Type="Text">ABC123</Value></Eq>
    *
-   * // 2. Neq (No igual a / Diferente de)
+   * // 2. Neq (Not equal to)
    * const notEqual = await client.search(autoListConfig, "marca", "Toyota", "Neq");
-   * // CAML generado: <Neq><FieldRef Name="Marca" /><Value Type="Text">Toyota</Value></Neq>
+   * // Generated CAML: <Neq><FieldRef Name="Marca" /><Value Type="Text">Toyota</Value></Neq>
    *
-   * // 3. Contains (Contiene - búsqueda parcial)
+   * // 3. Contains (Partial search)
    * const contains = await client.search(autoListConfig, "placa", "ABC", "Contains");
-   * // CAML generado: <Contains><FieldRef Name="Placa" /><Value Type="Text">ABC</Value></Contains>
+   * // Generated CAML: <Contains><FieldRef Name="Placa" /><Value Type="Text">ABC</Value></Contains>
    *
-   * // 4. BeginsWith (Comienza con)
+   * // 4. BeginsWith (Starts with)
    * const startsWith = await client.search(autoListConfig, "placa", "ABC", "BeginsWith");
-   * // CAML generado: <BeginsWith><FieldRef Name="Placa" /><Value Type="Text">ABC</Value></BeginsWith>
+   * // Generated CAML: <BeginsWith><FieldRef Name="Placa" /><Value Type="Text">ABC</Value></BeginsWith>
    *
-   * // ========== OPERADORES NUMÉRICOS ==========
+   * // ========== NUMERIC OPERATORS ==========
    *
-   * // 5. Gt (Mayor que)
+   * // 5. Gt (Greater than)
    * const greaterThan = await client.search(autoListConfig, "id", 100, "Gt");
-   * // CAML generado: <Gt><FieldRef Name="ID" /><Value Type="Number">100</Value></Gt>
+   * // Generated CAML: <Gt><FieldRef Name="ID" /><Value Type="Number">100</Value></Gt>
    *
-   * // 6. Geq (Mayor o igual que)
+   * // 6. Geq (Greater or equal than)
    * const greaterOrEqual = await client.search(autoListConfig, "id", 100, "Geq");
-   * // CAML generado: <Geq><FieldRef Name="ID" /><Value Type="Number">100</Value></Geq>
+   * // Generated CAML: <Geq><FieldRef Name="ID" /><Value Type="Number">100</Value></Geq>
    *
-   * // 7. Lt (Menor que)
+   * // 7. Lt (Less than)
    * const lessThan = await client.search(autoListConfig, "id", 500, "Lt");
-   * // CAML generado: <Lt><FieldRef Name="ID" /><Value Type="Number">500</Value></Lt>
+   * // Generated CAML: <Lt><FieldRef Name="ID" /><Value Type="Number">500</Value></Lt>
    *
-   * // 8. Leq (Menor o igual que)
+   * // 8. Leq (Less or equal than)
    * const lessOrEqual = await client.search(autoListConfig, "id", 500, "Leq");
-   * // CAML generado: <Leq><FieldRef Name="ID" /><Value Type="Number">500</Value></Leq>
+   * // Generated CAML: <Leq><FieldRef Name="ID" /><Value Type="Number">500</Value></Leq>
    *
-   * // ========== OPERADORES DE VALORES NULOS ==========
+   * // ========== NULL VALUE OPERATORS ==========
    *
-   * // 9. IsNull (Es nulo/vacío)
+   * // 9. IsNull (Is null/empty)
    * const isNull = await client.search(autoListConfig, "modelo", "", "IsNull");
-   * // CAML generado: <IsNull><FieldRef Name="Modelo" /></IsNull>
+   * // Generated CAML: <IsNull><FieldRef Name="Modelo" /></IsNull>
    *
-   * // 10. IsNotNull (No es nulo/vacío)
+   * // 10. IsNotNull (Is not null/empty)
    * const isNotNull = await client.search(autoListConfig, "modelo", "", "IsNotNull");
-   * // CAML generado: <IsNotNull><FieldRef Name="Modelo" /></IsNotNull>
+   * // Generated CAML: <IsNotNull><FieldRef Name="Modelo" /></IsNotNull>
    *
-   * // ========== OPERADORES DE FECHA ==========
+   * // ========== DATE OPERATORS ==========
    *
-   * // 11. DateRangesOverlap (Rango de fechas se superpone)
+   * // 11. DateRangesOverlap (Date range overlaps)
    * const dateOverlap = await client.search(autoListConfig, "fecha", "2024-01-01T00:00:00Z", "DateRangesOverlap");
-   * // CAML generado: <DateRangesOverlap><FieldRef Name="FechaRegistro" /><Value Type="DateTime">2024-01-01T00:00:00Z</Value></DateRangesOverlap>
+   * // Generated CAML: <DateRangesOverlap><FieldRef Name="FechaRegistro" /><Value Type="DateTime">2024-01-01T00:00:00Z</Value></DateRangesOverlap>
    *
-   * // ========== OPERADORES AVANZADOS ==========
+   * // ========== ADVANCED OPERATORS ==========
    *
-   * // 12. In (En lista de valores) - requiere usar read() directamente con filtro CAML
+   * // 12. In (In list of values) - requires using read() directly with CAML filter
    * // const inValues = await client.read(autoListConfig, {
    * //   filter: `<In><FieldRef Name="Marca" /><Values><Value Type="Text">Toyota</Value><Value Type="Text">Honda</Value></Values></In>`
    * // });
    *
-   * // ========== EJEMPLOS DE USO PRÁCTICO ==========
+   * // ========== PRACTICAL EXAMPLES ==========
    *
-   * // Buscar autos de una marca específica
+   * // Search cars of a specific brand
    * const toyotaCars = await client.search(autoListConfig, "marca", "Toyota", "Eq");
-   * console.log(`Encontrados ${toyotaCars.count} autos Toyota`);
+   * console.log(`Found ${toyotaCars.count} Toyota cars`);
    *
-   * // Buscar placas que contengan cierto texto
+   * // Search plates containing certain text
    * const placasABC = await client.search(autoListConfig, "placa", "ABC", "Contains");
-   * console.log(`Encontradas ${placasABC.count} placas con 'ABC'`);
+   * console.log(`Found ${placasABC.count} plates with 'ABC'`);
    *
-   * // Buscar autos registrados después de cierta fecha
+   * // Search cars registered after certain date
    * const recent = await client.search(autoListConfig, "fecha", "2024-01-01", "Gt");
-   * console.log(`${recent.count} autos registrados después del 1 enero 2024`);
+   * console.log(`${recent.count} cars registered after January 1, 2024`);
    *
-   * // Buscar modelos que no estén vacíos
+   * // Search models that are not empty
    * const withModel = await client.search(autoListConfig, "modelo", "", "IsNotNull");
-   * console.log(`${withModel.count} autos tienen modelo especificado`);
+   * console.log(`${withModel.count} cars have specified model`);
    * ```
    *
-   * @note **Mapeo de campos**: El parámetro `fieldName` debe ser la **clave de configuración**
-   * (ej: "placa"), que se mapea automáticamente al nombre real del campo en SharePoint
-   * (ej: "Placa") usando `listConfig.fields[fieldName]`.
+   * @note **Field mapping**: The `fieldName` parameter must be the **config key**
+   * (e.g., "placa"), which maps automatically to the actual SharePoint field name
+   * (e.g., "Placa") using `listConfig.fields[fieldName]`.
    *
-   * @note **Operadores CAML disponibles**:
-   * - **Comparación**: Eq, Neq, Contains, BeginsWith
-   * - **Numéricos**: Gt, Geq, Lt, Leq
-   * - **Nulos**: IsNull, IsNotNull
-   * - **Fechas**: DateRangesOverlap
-   * - **Avanzados**: In (usar con read() directamente)
+   * @note **Available CAML operators**:
+   * - **Comparison**: Eq, Neq, Contains, BeginsWith
+   * - **Numeric**: Gt, Geq, Lt, Leq
+   * - **Null**: IsNull, IsNotNull
+   * - **Date**: DateRangesOverlap
+   * - **Advanced**: In (use with read() directly)
    *
-   * @note **Tipos de datos soportados**:
-   * - **Text**: Cadenas de texto
-   * - **Number**: Números enteros y decimales
-   * - **DateTime**: Fechas en formato ISO (YYYY-MM-DDTHH:mm:ssZ)
-   * - **Boolean**: true/false (como "1"/"0")
-   * - **Choice**: Valores de campos de selección
-   * - **Lookup**: IDs de campos de búsqueda
+   * @note **Supported data types**:
+   * - **Text**: Text strings
+   * - **Number**: Integer and decimal numbers
+   * - **DateTime**: Dates in ISO format (YYYY-MM-DDTHH:mm:ssZ)
+   * - **Boolean**: true/false (as "1"/"0")
+   * - **Choice**: Select field values
+   * - **Lookup**: Lookup field IDs
    */
   async search(
     listConfig,
@@ -698,7 +696,7 @@ export class SharePointClient {
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
       throw new Error(
-        "Configuración de lista inválida",
+        "Invalid list configuration",
         validateListConfig.errorMessage,
       );
     }
@@ -741,11 +739,11 @@ export class SharePointClient {
   }
 
   /**
-   * Obtiene un elemento por ID
-   * @param {Object} listConfig - Configuración de la lista
-   * @param {number} itemId - ID del elemento
-   * @param {string[]} fields - Listado de campos a utilizar
-   * @returns {Promise<Object>} - Elemento encontrado
+   * Gets an item by ID
+   * @param {Object} listConfig - List configuration
+   * @param {number} itemId - Item ID
+   * @param {string[]} fields - List of fields to use
+   * @returns {Promise<Object>} - Found item
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -758,10 +756,10 @@ export class SharePointClient {
    * try {
    *   const result = await client.getById(taskListConfig, 1);
    *   if (result.success) {
-   *     console.log("Elemento encontrado:", result.item);
+   *     console.log("Item found:", result.item);
    *   }
    * } catch (error) {
-   *   console.error("Error obteniendo elemento:", error);
+   *   console.error("Error getting item:", error);
    * }
    * ```
    */
@@ -786,17 +784,17 @@ export class SharePointClient {
 
     return {
       success: false,
-      error: "Elemento no encontrado",
+      error: "Item not found",
       listName: result.listName,
     };
   }
 
   /**
-   * Actualiza un elemento existente
-   * @param {Object} listConfig - Configuración de la lista
-   * @param {number} itemId - ID del elemento
-   * @param {Object} updateData - Datos a actualizar
-   * @returns {Promise<Object>} - Resultado de la operación
+   * Updates an existing item
+   * @param {Object} listConfig - List configuration
+   * @param {number} itemId - Item ID
+   * @param {Object} updateData - Data to update
+   * @returns {Promise<Object>} - Operation result
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -806,14 +804,14 @@ export class SharePointClient {
    * });
    *
    * const dataToUpdate = {
-   *   status: "Completado"
+   *   status: "Completed"
    * };
    *
    * try {
    *   const result = await client.update(taskListConfig, 1, dataToUpdate);
-   *   console.log("Elemento actualizado:", result);
+   *   console.log("Item updated:", result);
    * } catch (error) {
-   *   console.error("Error actualizando elemento:", error);
+   *   console.error("Error updating item:", error);
    * }
    * ```
    */
@@ -823,7 +821,7 @@ export class SharePointClient {
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
       throw new Error(
-        "Configuración de lista inválida",
+        "Invalid list configuration",
         validateListConfig.errorMessage,
       );
     }
@@ -850,11 +848,11 @@ export class SharePointClient {
               success: true,
               data: itemData,
               listName: listConfig.name,
-              message: "Elemento actualizado exitosamente",
+              message: "Item updated successfully",
             };
 
             this._log(
-              `Elemento ${itemId} actualizado en ${listConfig.name}`,
+              `Item ${itemId} updated in ${listConfig.name}`,
             );
             resolve(result);
           },
@@ -867,14 +865,14 @@ export class SharePointClient {
             };
 
             this._logError(
-              `Error al actualizar elemento en ${listConfig.name}`,
+              `Error updating item in ${listConfig.name}`,
               error,
             );
             reject(error);
           },
         );
       } catch (error) {
-        this._logError("Error en método update", error);
+        this._logError("Error in update method", error);
         reject({
           success: false,
           error: error.message,
@@ -884,10 +882,10 @@ export class SharePointClient {
   }
 
   /**
-   * Elimina un elemento
-   * @param {Object} listConfig - Configuración de la lista
-   * @param {number} itemId - ID del elemento
-   * @returns {Promise<Object>} - Resultado de la operación
+   * Deletes an item
+   * @param {Object} listConfig - List configuration
+   * @param {number} itemId - Item ID
+   * @returns {Promise<Object>} - Operation result
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -896,9 +894,9 @@ export class SharePointClient {
    *
    * try {
    *   const result = await client.delete(taskListConfig, 1);
-   *   console.log("Elemento eliminado:", result);
+   *   console.log("Item deleted:", result);
    * } catch (error) {
-   *   console.error("Error eliminando elemento:", error);
+   *   console.error("Error deleting item:", error);
    * }
    * ```
    */
@@ -908,18 +906,18 @@ export class SharePointClient {
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
       throw new Error(
-        "Configuración de lista inválida",
+        "Invalid list configuration",
         validateListConfig.errorMessage,
       );
     }
 
-    // Obtener datos previos del elemento antes de eliminarlo
-    // para retornarlos al usuario (similar a como update retorna el estado)
+    // Get previous item data before deleting
+    // to return to user (similar to how update returns state)
     const getResult = await this.getById(listConfig, itemId);
     if (!getResult.success) {
       return Promise.reject({
         success: false,
-        error: `No se encontró el elemento con ID ${itemId}`,
+        error: `Item with ID ${itemId} not found`,
         listName: listConfig.name,
       });
     }
@@ -939,10 +937,10 @@ export class SharePointClient {
               success: true,
               data: previousItemData,
               listName: listConfig.name,
-              message: "Elemento eliminado exitosamente",
+              message: "Item deleted successfully",
             };
 
-            this._log(`Elemento ${itemId} eliminado de ${listConfig.name}`);
+            this._log(`Item ${itemId} deleted from ${listConfig.name}`);
             resolve(result);
           },
           (_sender, args) => {
@@ -954,14 +952,14 @@ export class SharePointClient {
             };
 
             this._logError(
-              `Error al eliminar elemento de ${listConfig.name}`,
+              `Error deleting item from ${listConfig.name}`,
               error,
             );
             reject(error);
           },
         );
       } catch (error) {
-        this._logError("Error en método delete", error);
+        this._logError("Error in delete method", error);
         reject({
           success: false,
           error: error.message,
