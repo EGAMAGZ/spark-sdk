@@ -15,11 +15,13 @@ interface SharePointClientOptions {
 
 export class SharePointClient {
   tty!: TTY;
-  static _instance = null;
+  static _instance: SharePointClient | null = null;
 
   options: SharePointClientOptions = {
     enableLogging: true,
   };
+  isInitialized: boolean = false;
+  initializationPromise: Promise<SharePointClient> | null = null;
 
   constructor() {
     if (SharePointClient._instance) {
@@ -29,8 +31,6 @@ export class SharePointClient {
     this.site = null;
     this.web = null;
     this.user = null;
-    this.isInitialized = false;
-    this.initializationPromise = null;
 
     this.tty = new TTY({
       enabled: this.options.enableLogging,
@@ -49,7 +49,7 @@ export class SharePointClient {
    * const client = SharePointClient.getInstance();
    * ```
    */
-  static getInstance() {
+  static getInstance(): SharePointClient {
     if (!SharePointClient._instance) {
       SharePointClient._instance = new SharePointClient();
     }
@@ -58,7 +58,7 @@ export class SharePointClient {
 
   /**
    * Sets global client options
-   * @param {Object} newOptions - New options
+   * @param newOptions - New options
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -74,7 +74,7 @@ export class SharePointClient {
   }
   /**
    * Initializes the SharePoint client
-   * @returns {Promise<SharePointClient>} - Promise that resolves with the initialized instance
+   * @returns Promise that resolves with the initialized instance
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -87,7 +87,7 @@ export class SharePointClient {
    * }
    * ```
    */
-  initialize() {
+  initialize(): Promise<SharePointClient> | SharePointClient {
     if (this.isInitialized) {
       return this;
     }
