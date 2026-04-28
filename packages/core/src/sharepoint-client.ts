@@ -378,9 +378,8 @@ export class SharePointClient {
 
     const validatedConfig = validateListConfig(listConfig);
     if (!validatedConfig.isValid) {
-      throw new Error(
-        "Invalid list configuration",
-        validateListConfig.errorMessage,
+      throw new InvalidListConfigError(
+        validatedConfig.errorMessage,
       );
     }
 
