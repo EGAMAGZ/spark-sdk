@@ -63,6 +63,10 @@ export class SPListBuilder {
   }
 }
 
+type ValidationResult =
+  | { isValid: false; errorMessage: string }
+  | { isValid: true; errorMessage?: never };
+
 /**
  * Valida la configuración de una lista
  * @param list - Configuración de la lista a validar
@@ -79,7 +83,7 @@ export class SPListBuilder {
  */
 export function validateListConfig<TFields extends Record<string, string>>(
   list: SPList<TFields>,
-): { isValid: boolean; errorMessage: string | null } {
+): ValidationResult {
   if (!list.name || typeof list.name !== "string") {
     return {
       isValid: false,
@@ -103,6 +107,5 @@ export function validateListConfig<TFields extends Record<string, string>>(
 
   return {
     isValid: true,
-    errorMessage: null,
   };
 }
