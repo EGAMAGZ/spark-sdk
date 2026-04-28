@@ -1,4 +1,5 @@
 import { validateListConfig } from "./list-config.ts";
+import { TTY } from "./tty.ts";
 
 /**
  * Default headers for SharePoint API requests.
@@ -9,6 +10,7 @@ const DEFAULT_HEADERS = {
 };
 
 export class SharePointClient {
+  tty!: TTY;
   static _instance = null;
 
   constructor() {
@@ -26,8 +28,12 @@ export class SharePointClient {
       enableLogging: true,
     };
 
+    this.tty = new TTY({
+      enabled: this.options.enableLogging,
+    });
+
     SharePointClient._instance = this;
-    this._log("SharePointClient Singleton created");
+    this.tty.log("SharePointClient Singleton created");
   }
 
   /**
@@ -60,7 +66,7 @@ export class SharePointClient {
    */
   setOptions(newOptions) {
     this.options = { ...this.options, ...newOptions };
-    this._log("Options updated", this.options);
+    this.tty.log("Options updated", this.options);
   }
   /**
    * Initializes the SharePoint client
@@ -96,7 +102,7 @@ export class SharePointClient {
    */
   async _performInitialization() {
     try {
-      this._log("Initializing SharePoint context...");
+      this.tty.log("Initializing SharePoint context...");
 
       const contextData = await this._initializeSharePointContext();
 
@@ -106,13 +112,13 @@ export class SharePointClient {
       this.user = contextData.user;
       this.isInitialized = true;
 
-      this._log("SharePoint Client initialized successfully", {
+      this.tty.log("SharePoint Client initialized successfully", {
         user: this.user?.LoginName,
       });
 
       return this;
     } catch (error) {
-      this._logError("Error during initialization", error);
+      this.tty.logError("Error during initialization", error);
       this.initializationPromise = null;
       throw error;
     }
@@ -159,7 +165,7 @@ export class SharePointClient {
 
               resolve({ current: context, site, web, user });
             } catch (error) {
-              this._logError("Error getting user data", error);
+              this.tty.logError("Error getting user data", error);
               reject(error);
             }
           };
@@ -168,13 +174,13 @@ export class SharePointClient {
             const error = new Error(
               `SharePoint context query failed: ${args.get_message()}`,
             );
-            this._logError("Context query failed", error);
+            this.tty.logError("Context query failed", error);
             reject(error);
           };
 
           context.executeQueryAsync(onSuccess, onFailure);
         } catch (error) {
-          this._logError("Error en executeFunc", error);
+          this.tty.logError("Error in executeFunc", error);
           reject(error);
         }
       });
@@ -203,42 +209,8 @@ export class SharePointClient {
       const body = await response.json();
       return body.d;
     } catch (err) {
-      this._logError("Error fetching user data", err);
+      this.tty.logError("Error fetching user data", err);
       return null;
-    }
-  }
-
-  /**
-   * Internal logger for the class
-   * @private
-   */
-  _log(message, data = null) {
-    if (!this.options.enableLogging) return;
-
-    const timestamp = new Date().toISOString().substring(11, 23);
-    const prefix = `[SharePointClient ${timestamp}]`;
-
-    if (data) {
-      console.log(`${prefix} ${message}`, data);
-    } else {
-      console.log(`${prefix} ${message}`);
-    }
-  }
-
-  /**
-   * Error logger
-   * @private
-   */
-  _logError(message, error = null) {
-    if (!this.options.enableLogging) return;
-
-    const timestamp = new Date().toISOString().substring(11, 23);
-    const prefix = `[SharePointClient ${timestamp}]`;
-
-    if (error) {
-      console.error(`${prefix} ❌ ${message}`, error);
-    } else {
-      console.error(`${prefix} ❌ ${message}`);
     }
   }
 
@@ -319,7 +291,7 @@ export class SharePointClient {
 
     queryXml += "</View>";
 
-    this._log("QueryXML:", queryXml);
+    this.tty.log("QueryXML:", queryXml);
     camlQuery.set_viewXml(queryXml);
     return camlQuery;
   }
@@ -345,7 +317,7 @@ export class SharePointClient {
           const fieldValue = item.get_item(listConfig.fields[key]);
           itemData[key] = this._processFieldValue(fieldValue, true);
         } catch (error) {
-          this._log(
+          this.tty.log(
             `Field '${key}' (${listConfig.fields[key]}) not available in item`,
             error.message,
           );
@@ -440,7 +412,7 @@ export class SharePointClient {
               message: "Item created successfully",
             };
 
-            this._log(`Item created in ${listConfig.name}`, result);
+            this.tty.log(`Item created in ${listConfig.name}`, result);
             resolve(result);
           },
           (_sender, args) => {
@@ -451,7 +423,7 @@ export class SharePointClient {
               listName: listConfig.name,
             };
 
-            this._logError(
+            this.tty.logError(
               `Error creating item in ${listConfig.name}`,
               error,
             );
@@ -459,7 +431,7 @@ export class SharePointClient {
           },
         );
       } catch (error) {
-        this._logError("Error in create method", error);
+        this.tty.logError("Error in create method", error);
         reject({
           success: false,
           error: error.message,
@@ -536,7 +508,7 @@ export class SharePointClient {
               listName: listConfig.name,
             };
 
-            this._log(
+            this.tty.log(
               `Retrieved ${itemsArray.length} items from ${listConfig.name}`,
             );
             resolve(result);
@@ -549,7 +521,7 @@ export class SharePointClient {
               listName: listConfig.name,
             };
 
-            this._logError(
+            this.tty.logError(
               `Error reading items from ${listConfig.name}`,
               error,
             );
@@ -557,7 +529,7 @@ export class SharePointClient {
           },
         );
       } catch (error) {
-        this._logError("Error in read method", error);
+        this.tty.logError("Error in read method", error);
         reject({
           success: false,
           error: error.message,
@@ -851,7 +823,7 @@ export class SharePointClient {
               message: "Item updated successfully",
             };
 
-            this._log(
+            this.tty.log(
               `Item ${itemId} updated in ${listConfig.name}`,
             );
             resolve(result);
@@ -864,7 +836,7 @@ export class SharePointClient {
               listName: listConfig.name,
             };
 
-            this._logError(
+            this.tty.logError(
               `Error updating item in ${listConfig.name}`,
               error,
             );
@@ -872,7 +844,7 @@ export class SharePointClient {
           },
         );
       } catch (error) {
-        this._logError("Error in update method", error);
+        this.tty.logError("Error in update method", error);
         reject({
           success: false,
           error: error.message,
@@ -940,7 +912,7 @@ export class SharePointClient {
               message: "Item deleted successfully",
             };
 
-            this._log(`Item ${itemId} deleted from ${listConfig.name}`);
+            this.tty.log(`Item ${itemId} deleted from ${listConfig.name}`);
             resolve(result);
           },
           (_sender, args) => {
@@ -951,7 +923,7 @@ export class SharePointClient {
               listName: listConfig.name,
             };
 
-            this._logError(
+            this.tty.logError(
               `Error deleting item from ${listConfig.name}`,
               error,
             );
@@ -959,7 +931,7 @@ export class SharePointClient {
           },
         );
       } catch (error) {
-        this._logError("Error in delete method", error);
+        this.tty.logError("Error in delete method", error);
         reject({
           success: false,
           error: error.message,
