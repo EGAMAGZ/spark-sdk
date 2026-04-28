@@ -6,6 +6,7 @@ import {
   ListConfigFactory,
   SharePointClient,
 } from "../src/sharepoint-client.ts";
+import { SPListBuilder } from "../src/list-config.ts";
 
 describe("SharePointClient", () => {
   let fetchStub;
@@ -168,14 +169,14 @@ describe("SharePointClient", () => {
       await assertRejects(
         () => client.initialize(),
         Error,
-        "SharePoint JavaScript libraries no están disponibles",
+        "SharePoint JavaScript libraries are not available",
       );
     });
   });
 
   describe("CRUD Operations", () => {
     let client;
-    const listConfig = ListConfigFactory.createCustomConfig("Tasks", {
+    const listConfig = SPListBuilder.create("Tasks", {
       status: "Status",
       description: "Description",
     });
@@ -313,7 +314,7 @@ describe("SharePointClient", () => {
           throw new Error("Should have failed");
         } catch (error) {
           assertEquals(error.success, false);
-          assertEquals(error.error.includes("No se encontró"), true);
+          assertEquals(error.error.includes("not found"), true);
         }
       });
 
@@ -333,7 +334,7 @@ describe("SharePointClient", () => {
 
   describe("CAML Query Construction", () => {
     let client;
-    const listConfig = ListConfigFactory.createCustomConfig("Tasks", {
+    const listConfig = SPListBuilder.create("Tasks", {
       status: "Status",
       description: "Description",
     });
@@ -393,7 +394,7 @@ describe("SharePointClient", () => {
 
   describe("Error Handling", () => {
     let client;
-    const listConfig = ListConfigFactory.createCustomConfig("Tasks", {});
+    const listConfig = SPListBuilder.create("Tasks", {});
 
     beforeEach(async () => {
       client = SharePointClient.getInstance();
