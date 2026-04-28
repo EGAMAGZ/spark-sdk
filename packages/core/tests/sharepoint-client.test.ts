@@ -2,12 +2,8 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertObjectMatch, assertRejects } from "@std/assert";
 import { assertSpyCalls, spy, stub } from "@std/testing/mock";
-import {
-  ListConfigFactory,
-  SharePointClient,
-} from "../src/sharepoint-client.ts";
+import { SharePointClient } from "../src/sharepoint-client.ts";
 import { SPListBuilder } from "../src/list-config.ts";
-import { title } from "node:process";
 
 describe("SharePointClient", () => {
   let fetchStub;
@@ -405,10 +401,10 @@ describe("SharePointClient", () => {
     it("should handle invalid list configuration", async () => {
       const invalidConfig = {
         colums: {
-            status: "Status", 
+          status: "Status",
         },
         title: "InvalidList",
-      }
+      };
 
       try {
         await client.read(invalidConfig);
@@ -418,7 +414,7 @@ describe("SharePointClient", () => {
     });
 
     it("should handle executeQueryAsync errors", async () => {
-      contextMock.executeQueryAsync = spy((success, failure) => {
+      contextMock.executeQueryAsync = spy((_success, failure) => {
         const argsMock = {
           get_message: () => "SharePoint Error",
           get_stackTrace: () => "Stack Trace",

@@ -1,4 +1,4 @@
-import { validateListConfig } from "./list-config.ts";
+import { validateListConfig, type SPList } from "./list-config.ts";
 import { TTY } from "./tty.ts";
 import { InvalidListConfigError } from "./exceptions.ts";
 
@@ -14,6 +14,11 @@ interface SharePointClientOptions {
   enableLogging?: boolean;
 }
 
+interface SPUser {
+  Id: number;
+  LoginName: string;
+}
+
 export class SharePointClient {
   tty!: TTY;
   static _instance: SharePointClient | null = null;
@@ -23,6 +28,7 @@ export class SharePointClient {
   };
   isInitialized: boolean = false;
   initializationPromise: Promise<SharePointClient> | null = null;
+  user: SPUser | null = null;
 
   constructor() {
     if (SharePointClient._instance) {
@@ -31,7 +37,6 @@ export class SharePointClient {
     this.context = null;
     this.site = null;
     this.web = null;
-    this.user = null;
 
     this.tty = new TTY({
       enabled: this.options.enableLogging,
