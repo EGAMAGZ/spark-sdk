@@ -1,4 +1,4 @@
-import { validateListConfig, type SPList } from "./list-config.ts";
+import { type SPList, validateListConfig } from "./list-config.ts";
 import { TTY } from "./tty.ts";
 import { InvalidListConfigError } from "./exceptions.ts";
 
@@ -334,7 +334,7 @@ export class SharePointClient {
 
   /**
    * Gets current user information
-   * @returns {Object} - User information
+   * @returns User information
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -352,9 +352,9 @@ export class SharePointClient {
 
   /**
    * Creates a new item in the specified list
-   * @param {Object} listConfig - List configuration
-   * @param {Object} itemData - Item data to create
-   * @returns {Promise<Object>} - Operation result
+   * @param listConfig - List configuration
+   * @param itemData - Item data to create
+   * @returns Operation result
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -445,9 +445,9 @@ export class SharePointClient {
 
   /**
    * Reads items from the current or specified list
-   * @param {Object} listConfig - List configuration
-   * @param {Object} options - Query options
-   * @returns {Promise<Object>} - Found items
+   * @param listConfig - List configuration
+   * @param options - Query options
+   * @returns Found items
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -542,12 +542,12 @@ export class SharePointClient {
 
   /**
    * Searches items by specific field using CAML operators
-   * @param {Object} listConfig - List configuration
-   * @param {string} fieldName - Field name (use config key, e.g., "placa")
-   * @param {string|number|boolean|Date} searchValue - Value to search
-   * @param {string} operator - CAML comparison operator (default: "Contains")
-   * @param {string[]} fields - List of fields to use
-   * @returns {Promise<Object>} - Found items
+   * @param listConfig - List configuration
+   * @param fieldName - Field name (use config key, e.g., "placa")
+   * @param searchValue - Value to search
+   * @param operator - CAML comparison operator (default: "Contains")
+   * @param fields - List of fields to use
+   * @returns Found items
    *
    * @example
    * ```js
@@ -713,10 +713,10 @@ export class SharePointClient {
 
   /**
    * Gets an item by ID
-   * @param {Object} listConfig - List configuration
-   * @param {number} itemId - Item ID
-   * @param {string[]} fields - List of fields to use
-   * @returns {Promise<Object>} - Found item
+   * @param listConfig - List configuration
+   * @param itemId - Item ID
+   * @param fields - List of fields to use
+   * @returns Found item
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -736,7 +736,7 @@ export class SharePointClient {
    * }
    * ```
    */
-  async getById(listConfig, itemId, fields) {
+  async getById(listConfig, itemId: number, fields) {
     const options = {
       filter:
         `<Eq><FieldRef Name="ID" /><Value Type="Number">${itemId}</Value></Eq>`,
@@ -764,10 +764,10 @@ export class SharePointClient {
 
   /**
    * Updates an existing item
-   * @param {Object} listConfig - List configuration
-   * @param {number} itemId - Item ID
-   * @param {Object} updateData - Data to update
-   * @returns {Promise<Object>} - Operation result
+   * @param listConfig - List configuration
+   * @param itemId - Item ID
+   * @param updateData - Data to update
+   * @returns Operation result
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -788,7 +788,7 @@ export class SharePointClient {
    * }
    * ```
    */
-  async update(listConfig, itemId, updateData) {
+  async update(listConfig, itemId: number, updateData) {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -855,9 +855,9 @@ export class SharePointClient {
 
   /**
    * Deletes an item
-   * @param {Object} listConfig - List configuration
-   * @param {number} itemId - Item ID
-   * @returns {Promise<Object>} - Operation result
+   * @param listConfig - List configuration
+   * @param itemId - Item ID
+   * @returns Operation result
    * @example
    * ```ts
    * import { SharePointClient } from "@spark-sdk/core";
@@ -872,7 +872,7 @@ export class SharePointClient {
    * }
    * ```
    */
-  async delete(listConfig, itemId) {
+  async delete(listConfig, itemId: number) {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
