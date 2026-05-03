@@ -161,6 +161,8 @@ interface SharePointClientOptions {
 interface SPUser {
   Id: number;
   LoginName: string;
+  Title: string;
+  Email: string;
 }
 
 export class SharePointClient {
