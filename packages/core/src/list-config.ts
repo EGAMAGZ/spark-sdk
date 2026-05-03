@@ -2,7 +2,7 @@
  * Represents the fields of a SharePoint list.
  * @typeParam TFields - Custom fields extending Record<string, string>
  */
-export type ListFields<TFields extends Record<string, string>> =
+export type SPListConfigFields<TFields extends Record<string, unknown>> =
   & {
     [K in keyof TFields]: string;
   }
@@ -11,12 +11,67 @@ export type ListFields<TFields extends Record<string, string>> =
 /**
  * Configuration object for a SharePoint list.
  * @typeParam TFields - Custom fields extending Record<string, string>
+ * @example
+ * ```ts
+ * import { type SPList } from "@spark-sdk/core"
+ * const taskListConfig: SPList = {
+ *   name: "Tasks",
+ *   fields: {
+ *     title: "Title",
+ *     description: "Description",
+ *     status: "Status"
+ *   }
+ * };
+ * ```
  */
-export type SPList<TFields extends Record<string, string>> = {
+export type SPListConfig<TFields extends Record<string, string>> = {
   /** The name of the SharePoint list */
   name: string;
   /** The fields configured for the list */
-  fields: ListFields<TFields>;
+  fields: SPListConfigFields<TFields>;
+};
+
+/**
+ * Represents the values stored in a SharePoint list item for a task list.
+ *
+ * This type derives its keys from `SPListConfig.fields` and provides
+ * autocompletion for each field defined in the list configuration.
+ *
+ * @typeParam TFields - The field mapping object from `SPListConfig.fields`
+ *
+ * @example
+ * ```ts
+ * import { type SPFields } from "@spark-sdk/core";
+ *
+ * const taskListConfig = {
+ *   title: "Title",
+ *   description: "Description",
+ *   status: "Status",
+ *   due: "Due",
+ *   completed: "Completed",
+ *   tags: "Tags",
+ * } as const;
+ *
+ * type TaskFields = SPFields<typeof taskListConfig>;
+ *
+ * const taskFields: TaskFields = {
+ *   title: "Nueva tarea",
+ *   description: "Descripción de la nueva tarea",
+ *   status: "In Progress",
+ *   due: "2026-05-02T12:00:00.000Z",
+ *   completed: false,
+ *   tags: ["marketing", "publicidad"],
+ * };
+ * ```
+ */
+export type SPFields<TFields extends Record<string, string>> = {
+  [K in keyof SPListConfigFields<TFields>]:
+    | string
+    | number
+    | boolean
+    | string[]
+    | null
+    | undefined
 };
 
 /**
@@ -52,7 +107,7 @@ export class SPListBuilder {
   static create<TFields extends Record<string, string>>(
     listName: string,
     customFields: TFields,
-  ): SPList<TFields> {
+  ): SPListConfig<TFields> {
     return {
       name: listName,
       fields: {
@@ -82,7 +137,7 @@ type ValidationResult =
  * ```
  */
 export function validateListConfig<TFields extends Record<string, string>>(
-  list: SPList<TFields>,
+  list: SPListConfig<TFields>,
 ): ValidationResult {
   if (!list.name || typeof list.name !== "string") {
     return {

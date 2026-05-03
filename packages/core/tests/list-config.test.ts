@@ -1,8 +1,9 @@
 import { expect } from "@std/expect";
 import { describe, it } from "@std/testing/bdd";
 import {
-  type ListFields,
-  type SPList,
+  type SPListConfigFields,
+  type SPListConfig,
+  type SPFields,
   SPListBuilder,
 } from "../src/list-config.ts";
 
@@ -89,7 +90,7 @@ describe("SPListBuilder.create", () => {
   });
 
   it("satisfies the SPList<TFields> return type structure", () => {
-    const list: SPList<{ priority: string }> = SPListBuilder.create(
+    const list: SPListConfig<{ priority: string }> = SPListBuilder.create(
       "Issues",
       { priority: "Priority" },
     );
@@ -100,13 +101,35 @@ describe("SPListBuilder.create", () => {
   });
 
   it("satisfies the ListFields type by always including title", () => {
-    const fields: ListFields<{ category: string }> = SPListBuilder.create(
+    const fields: SPListConfigFields<{ category: string }> = SPListBuilder.create(
       "Articles",
       { category: "Category" },
     ).fields;
 
     expect(fields.title).toBe("Title");
     expect(fields.category).toBe("Category");
+  });
+
+  it("infers item field keys from the list config fields", () => {
+    const list = SPListBuilder.create("Tasks", {
+      description: "Description",
+      status: "Status",
+      due: "Due",
+      completed: "Completed",
+      tags: "Tags",
+    });
+
+    const taskFields: SPFields<typeof list.fields> = {
+      title: "Nueva tarea",
+      description: "Descripción de la nueva tarea",
+      status: "In Progress",
+      due: "2026-05-02T12:00:00.000Z",
+      completed: false,
+      tags: ["marketing", "publicidad"],
+    };
+
+    expect(taskFields.title).toBe("Nueva tarea");
+    expect(taskFields.completed).toBe(false);
   });
 
   it("handles list names with spaces and special characters", () => {

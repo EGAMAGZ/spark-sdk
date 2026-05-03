@@ -1,6 +1,24 @@
-import { type SPList, validateListConfig } from "./list-config.ts";
+import {
+  type SPFields,
+  type SPListConfig,
+  validateListConfig,
+} from "./list-config.ts";
 import { TTY } from "./tty.ts";
 import { InvalidListConfigError } from "./exceptions.ts";
+
+export type SPResponse<T> =
+  | {
+    success: true;
+    data: T;
+    listName: string;
+    message: string;
+  }
+  | {
+    success: false;
+    error: string;
+    details?: string;
+    listName: string;
+  };
 
 /**
  * Default headers for SharePoint API requests.
@@ -353,7 +371,7 @@ export class SharePointClient {
   /**
    * Creates a new item in the specified list
    * @param listConfig - List configuration
-   * @param itemData - Item data to create
+   * @param fields - Item data to create
    * @returns Operation result
    * @example
    * ```ts
@@ -378,7 +396,10 @@ export class SharePointClient {
    * }
    * ```
    */
-  async create(listConfig, itemData) {
+  async create<TFields extends Record<string, string>>(
+    listConfig: SPListConfig<TFields>,
+    fields: Partial<SPFields<TFields>>,
+  ): Promise<SPResponse<SPFields<TFields>>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -394,9 +415,9 @@ export class SharePointClient {
         const listItemCreationInfo = new SP.ListItemCreationInformation();
         const newItem = list.addItem(listItemCreationInfo);
 
-        Object.keys(itemData).forEach((key) => {
+        Object.keys(fields).forEach((key) => {
           if (listConfig.fields[key]) {
-            const fieldValue = this._processFieldValue(itemData[key]);
+            const fieldValue = this._processFieldValue(fields[key]);
             newItem.set_item(listConfig.fields[key], fieldValue);
           }
         });
@@ -438,6 +459,7 @@ export class SharePointClient {
         reject({
           success: false,
           error: error.message,
+          listName: listConfig.name,
         });
       }
     });
@@ -471,7 +493,10 @@ export class SharePointClient {
    * console.log(filteredItems);
    * ```
    */
-  async read(listConfig, options = {}) {
+  async read<TFields extends Record<string, string>>(
+    listConfig: SPListConfig<TFields>,
+    options = {},
+  ): Promise<SPResponse<SPFields<TFields>>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -505,9 +530,9 @@ export class SharePointClient {
 
             const result = {
               success: true,
-              items: itemsArray,
-              count: itemsArray.length,
+              data: itemsArray,
               listName: listConfig.name,
+              message: `Retrieved ${itemsArray.length} items`,
             };
 
             this.tty.log(
@@ -535,6 +560,7 @@ export class SharePointClient {
         reject({
           success: false,
           error: error.message,
+          listName: listConfig.name,
         });
       }
     });
@@ -657,13 +683,13 @@ export class SharePointClient {
    * - **Choice**: Select field values
    * - **Lookup**: Lookup field IDs
    */
-  async search(
-    listConfig,
-    fieldName,
-    searchValue,
+  async search<TFields extends Record<string, string>>(
+    listConfig: SPListConfig<TFields>,
+    fieldName: string,
+    searchValue: string | number | boolean | Date,
     operator = "Contains",
-    fields,
-    rowLimit,
+    fields: SPFields<TFields>,
+    rowLimit: number,
   ) {
     await this._ensureInitialized();
 
@@ -736,7 +762,11 @@ export class SharePointClient {
    * }
    * ```
    */
-  async getById(listConfig, itemId: number, fields) {
+  async getById<TFields extends Record<string, string>>(
+    listConfig: SPListConfig<TFields>,
+    itemId: number,
+    fields?: SPFields<TFields>,
+  ): Promise<SPResponse<SPFields<TFields>>> {
     const options = {
       filter:
         `<Eq><FieldRef Name="ID" /><Value Type="Number">${itemId}</Value></Eq>`,
@@ -747,11 +777,12 @@ export class SharePointClient {
 
     const result = await this.read(listConfig, options);
 
-    if (result.success && result.items.length > 0) {
+    if (result.success && result.data.length > 0) {
       return {
         success: true,
-        item: result.items[0],
+        data: result.data[0],
         listName: result.listName,
+        message: "Item retrieved successfully",
       };
     }
 
@@ -788,7 +819,11 @@ export class SharePointClient {
    * }
    * ```
    */
-  async update(listConfig, itemId: number, updateData) {
+  async update<TFields extends Record<string, string>>(
+    listConfig: SPListConfig<TFields>,
+    itemId: number,
+    updateData: Partial<SPFields<TFields>>,
+  ): Promise<SPResponse<SPFields<TFields>>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -872,7 +907,10 @@ export class SharePointClient {
    * }
    * ```
    */
-  async delete(listConfig, itemId: number) {
+  async delete<TFields extends Record<string, string>>(
+    listConfig: SPListConfig<TFields>,
+    itemId: number,
+  ): Promise<SPResponse<SPFields<TFields>>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -934,6 +972,7 @@ export class SharePointClient {
         reject({
           success: false,
           error: error.message,
+          listName: listConfig.name,
         });
       }
     });

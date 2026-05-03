@@ -217,10 +217,10 @@ describe("SharePointClient", () => {
         const result = await client.read(listConfig);
 
         assertEquals(result.success, true);
-        assertEquals(result.items.length, 1);
-        assertEquals(result.items[0].title, "Test Item");
-        assertEquals(result.items[0].status, "Pending");
-        assertEquals(result.items[0].description, "Test Description");
+        assertEquals(result.data.length, 1);
+        assertEquals(result.data[0].title, "Test Item");
+        assertEquals(result.data[0].status, "Pending");
+        assertEquals(result.data[0].description, "Test Description");
 
         assertSpyCalls(listMock.getItems, 1);
       }); // read returns items array, not wrapped in data
@@ -229,9 +229,9 @@ describe("SharePointClient", () => {
         const result = await client.getById(listConfig, 1);
 
         assertEquals(result.success, true);
-        assertEquals(result.item.id, 1);
-        assertEquals(result.item.title, "Test Item");
-        assertEquals(result.item.status, "Pending");
+        assertEquals(result.data.id, 1);
+        assertEquals(result.data.title, "Test Item");
+        assertEquals(result.data.status, "Pending");
 
         assertSpyCalls(listMock.getItems, 1);
       }); // getById returns item directly, not wrapped in data
