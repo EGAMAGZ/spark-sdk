@@ -6,6 +6,132 @@ import {
 import { TTY } from "./tty.ts";
 import { InvalidListConfigError } from "./exceptions.ts";
 
+declare global {
+  var SP: SPNamespace;
+}
+
+/**
+ * SharePoint field value types - can be primitives, objects, or arrays
+ */
+type SPFieldValue = string | number | boolean | Date | SPFieldLookupValue | SPFieldUserValue | SPFieldValue[] | null | undefined;
+
+/**
+ * Processed field value after reading from SharePoint (dates as strings, lookups as values)
+ */
+type SPProcessedFieldValue = string | number | boolean | string[] | null | undefined;
+
+/**
+ * Processed item data from SharePoint
+ */
+type SPItemData = Record<string, SPProcessedFieldValue>;
+
+interface SPFieldLookupValue {
+  get_lookupValue(): string | number;
+}
+
+interface SPFieldUserValue {
+  get_loginName(): string;
+  get_lookupValue(): number;
+}
+
+/**
+ * Base type for any SharePoint object that can be loaded
+ */
+type SPObject = SPSite | SPWeb | SPList | SPListItem | SPListItemCollection | SPListItemEnumerator;
+
+/**
+ * SharePoint callback argument types
+ */
+type SPQueryAsyncSuccessArgs = undefined;
+
+interface SPNamespace {
+  SOD: {
+    executeFunc(libName: string, functionName: string, callback: () => void): void;
+  };
+  ClientContext: {
+    get_current(): SPClientContext;
+  };
+  CamlQuery: new () => SPCamlQuery;
+  ListItemCreationInformation: new () => SPListItemCreationInformation;
+}
+
+interface SPClientContext {
+  get_site(): SPSite;
+  get_web(): SPWeb;
+  load(obj: SPObject): void;
+  executeQueryAsync(
+    onSuccess: (sender?: SPClientContext, args?: SPQueryAsyncSuccessArgs) => void,
+    onFailure?: (sender?: SPClientContext, args?: SPFailedEventArgs) => void,
+  ): void;
+}
+
+interface SPSite {
+  get_url(): string;
+}
+
+interface SPWeb {
+  get_url(): string;
+  get_lists(): SPListCollection;
+}
+
+interface SPListCollection {
+  getByTitle(title: string): SPList;
+}
+
+interface SPList {
+  get_title(): string;
+  addItem(itemCreationInfo: SPListItemCreationInformation): SPListItem;
+  getItemById(id: number): SPListItem;
+  getItems(query: SPCamlQuery): SPListItemCollection;
+}
+
+interface SPListItem {
+  get_id(): number;
+  get_item(fieldName: string): SPFieldValue;
+  set_item(fieldName: string, value: SPFieldValue): void;
+  update(): void;
+  deleteObject(): void;
+}
+
+interface SPListItemCollection {
+  getEnumerator(): SPListItemEnumerator;
+}
+
+interface SPListItemEnumerator {
+  moveNext(): boolean;
+  get_current(): SPListItem;
+}
+
+interface SPCamlQuery {
+  set_viewXml(xml: string): void;
+}
+
+interface SPListItemCreationInformation {
+  // Marker interface
+}
+
+interface SPFailedEventArgs {
+  get_message(): string;
+  get_stackTrace(): string;
+}
+
+interface SPContextData {
+  current: SPClientContext;
+  site: SPSite;
+  web: SPWeb;
+  user: SPUser;
+}
+
+interface CamlQueryOptions<TFields extends Record<string, string>> {
+  fields?: Array<string | keyof TFields>;
+  filter?: string;
+  orderBy?: {
+    field: string | keyof TFields;
+    ascending?: boolean;
+  };
+  rowLimit?: number;
+}
+
 export type SPResponse<T> =
   | {
     success: true;
@@ -40,6 +166,9 @@ interface SPUser {
 export class SharePointClient {
   tty!: TTY;
   static _instance: SharePointClient | null = null;
+  context: SPClientContext | null = null;
+  site: SPSite | null = null;
+  web: SPWeb | null = null;
 
   options: SharePointClientOptions = {
     enableLogging: true,
@@ -131,7 +260,7 @@ export class SharePointClient {
     try {
       this.tty.log("Initializing SharePoint context...");
 
-      const contextData = await this._initializeSharePointContext();
+      const contextData: SPContextData = await this._initializeSharePointContext();
 
       this.context = contextData.current;
       this.site = contextData.site;
@@ -163,18 +292,18 @@ export class SharePointClient {
   /**
    * Initializes the SharePoint context
    */
-  private _initializeSharePointContext() {
+  private _initializeSharePointContext(): Promise<SPContextData> {
     return new Promise((resolve, reject) => {
-      if (typeof SP === "undefined" || !SP.SOD) {
+      if (typeof globalThis.SP === "undefined" || !globalThis.SP.SOD) {
         reject(
           new Error("SharePoint JavaScript libraries are not available"),
         );
         return;
       }
 
-      SP.SOD.executeFunc("sp.js", "SP.ClientContext", async () => {
+      globalThis.SP.SOD.executeFunc("sp.js", "SP.ClientContext", () => {
         try {
-          const context = SP.ClientContext.get_current();
+          const context = globalThis.SP.ClientContext.get_current();
           const site = context.get_site();
           const web = context.get_web();
           context.load(web);
@@ -195,9 +324,9 @@ export class SharePointClient {
             }
           };
 
-          const onFailure = (_sender, args) => {
+          const onFailure = (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
             const error = new Error(
-              `SharePoint context query failed: ${args.get_message()}`,
+              `SharePoint context query failed: ${args?.get_message()}`,
             );
             this.tty.logError("Context query failed", error);
             reject(error);
@@ -242,16 +371,21 @@ export class SharePointClient {
   /**
    * Processes field values for read/write operations
    */
-  private _processFieldValue(value, isReading = false) {
+  private _processFieldValue(value: SPFieldValue, isReading: boolean = false): SPProcessedFieldValue {
     if (value === null || value === undefined) {
       return null;
     }
 
     // If reading and the value has SP special properties
-    if (isReading && typeof value === "object") {
-      // User/Person field
-      if (value.get_lookupValue) {
-        return value.get_lookupValue();
+    if (isReading && typeof value === "object" && value !== null) {
+      // Lookup field
+      if ("get_lookupValue" in value) {
+        return (value as SPFieldLookupValue).get_lookupValue();
+      }
+
+      // User field
+      if ("get_loginName" in value) {
+        return (value as unknown as SPFieldUserValue).get_loginName();
       }
 
       // Date field
@@ -260,14 +394,17 @@ export class SharePointClient {
       }
     }
 
-    return value;
+    return value as SPProcessedFieldValue;
   }
 
   /**
    * Builds a CAML query
    */
-  private _buildCamlQuery(options, listConfig) {
-    const camlQuery = new SP.CamlQuery();
+  private _buildCamlQuery<TFields extends Record<string, string>>(
+    options: CamlQueryOptions<TFields>,
+    listConfig: SPListConfig<TFields>,
+  ): SPCamlQuery {
+    const camlQuery = new globalThis.SP.CamlQuery();
     let queryXml = "<View>";
 
     if (options.fields && options.fields.length > 0) {
@@ -279,9 +416,10 @@ export class SharePointClient {
         queryXml += `<FieldRef Name="Title" />`;
       }
 
-      options.fields.forEach((field) => {
-        if (field !== "title") {
-          const sharePointFieldName = listConfig.fields[field] || field;
+      options.fields.forEach((field: string | keyof TFields) => {
+        const fieldStr = String(field);
+        if (fieldStr !== "title") {
+          const sharePointFieldName = listConfig.fields[fieldStr] || fieldStr;
           queryXml += `<FieldRef Name="${sharePointFieldName}" />`;
         }
       });
@@ -297,8 +435,9 @@ export class SharePointClient {
 
       if (options.orderBy) {
         queryXml += "<OrderBy>";
-        const sharePointFieldName = listConfig.fields[options.orderBy.field] ||
-          options.orderBy.field;
+        const orderByFieldStr = String(options.orderBy.field);
+        const sharePointFieldName = listConfig.fields[orderByFieldStr] ||
+          orderByFieldStr;
         queryXml += `<FieldRef Name="${sharePointFieldName}" Ascending="${
           options.orderBy.ascending !== false
         }" />`;
@@ -322,15 +461,19 @@ export class SharePointClient {
   /**
    * Processes item data
    */
-  private _processItemData(item, listConfig, requestedFields = null) {
-    const itemData = {
+  private _processItemData<TFields extends Record<string, string>>(
+    item: SPListItem,
+    listConfig: SPListConfig<TFields>,
+    requestedFields: Array<string | keyof TFields> | null = null,
+  ): SPItemData {
+    // Cast requestedFields to string[] for processing
+    const fieldsToProcess = requestedFields ? (requestedFields.map(String)) : Object.keys(listConfig.fields);
+    const itemData: Record<string, SPProcessedFieldValue> = {
       id: item.get_id(),
     };
 
-    const fieldsToProcess = requestedFields || Object.keys(listConfig.fields);
-
     if (!requestedFields || requestedFields.includes("title")) {
-      itemData.title = item.get_item("Title");
+      itemData.title = this._processFieldValue(item.get_item("Title"), true);
     }
 
     fieldsToProcess.forEach((key) => {
@@ -340,8 +483,8 @@ export class SharePointClient {
           itemData[key] = this._processFieldValue(fieldValue, true);
         } catch (error) {
           this.tty.log(
-            `Field '${key}' (${listConfig.fields[key]}) not available in item`,
-            error.message,
+            `Field '${String(key)}' (${listConfig.fields[key]}) not available in item`,
+            (error as Error).message,
           );
         }
       }
@@ -399,7 +542,7 @@ export class SharePointClient {
   async create<TFields extends Record<string, string>>(
     listConfig: SPListConfig<TFields>,
     fields: Partial<SPFields<TFields>>,
-  ): Promise<SPResponse<SPFields<TFields>>> {
+  ): Promise<SPResponse<SPItemData>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -411,8 +554,8 @@ export class SharePointClient {
 
     return new Promise((resolve, reject) => {
       try {
-        const list = this.web.get_lists().getByTitle(listConfig.name);
-        const listItemCreationInfo = new SP.ListItemCreationInformation();
+        const list = this.web!.get_lists().getByTitle(listConfig.name);
+        const listItemCreationInfo = new globalThis.SP.ListItemCreationInformation();
         const newItem = list.addItem(listItemCreationInfo);
 
         Object.keys(fields).forEach((key) => {
@@ -424,9 +567,9 @@ export class SharePointClient {
 
         newItem.update();
 
-        this.context.load(newItem);
+        this.context!.load(newItem);
 
-        this.context.executeQueryAsync(
+        this.context!.executeQueryAsync(
           () => {
             const itemData = this._processItemData(newItem, listConfig);
             const result = {
@@ -437,13 +580,13 @@ export class SharePointClient {
             };
 
             this.tty.log(`Item created in ${listConfig.name}`, result);
-            resolve(result);
+            resolve(result as SPResponse<SPItemData>);
           },
-          (_sender, args) => {
+          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
             const error = {
               success: false,
-              error: args.get_message(),
-              details: args.get_stackTrace(),
+              error: args?.get_message(),
+              details: args?.get_stackTrace(),
               listName: listConfig.name,
             };
 
@@ -458,7 +601,7 @@ export class SharePointClient {
         this.tty.logError("Error in create method", error);
         reject({
           success: false,
-          error: error.message,
+          error: (error as Error).message,
           listName: listConfig.name,
         });
       }
@@ -495,8 +638,8 @@ export class SharePointClient {
    */
   async read<TFields extends Record<string, string>>(
     listConfig: SPListConfig<TFields>,
-    options = {},
-  ): Promise<SPResponse<SPFields<TFields>>> {
+    options: CamlQueryOptions<TFields> = {},
+  ): Promise<SPResponse<SPItemData[]>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -508,14 +651,14 @@ export class SharePointClient {
 
     return new Promise((resolve, reject) => {
       try {
-        const list = this.web.get_lists().getByTitle(listConfig.name);
+        const list = this.web!.get_lists().getByTitle(listConfig.name);
         const camlQuery = this._buildCamlQuery(options, listConfig);
         const items = list.getItems(camlQuery);
-        this.context.load(items);
+        this.context!.load(items);
 
-        this.context.executeQueryAsync(
+        this.context!.executeQueryAsync(
           () => {
-            const itemsArray = [];
+            const itemsArray: Array<SPItemData> = [];
             const enumerator = items.getEnumerator();
 
             while (enumerator.moveNext()) {
@@ -538,13 +681,13 @@ export class SharePointClient {
             this.tty.log(
               `Retrieved ${itemsArray.length} items from ${listConfig.name}`,
             );
-            resolve(result);
+            resolve(result as SPResponse<SPItemData[]>);
           },
-          (_sender, args) => {
+          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
             const error = {
               success: false,
-              error: args.get_message(),
-              details: args.get_stackTrace(),
+              error: args?.get_message(),
+              details: args?.get_stackTrace(),
               listName: listConfig.name,
             };
 
@@ -559,7 +702,7 @@ export class SharePointClient {
         this.tty.logError("Error in read method", error);
         reject({
           success: false,
-          error: error.message,
+          error: (error as Error).message,
           listName: listConfig.name,
         });
       }
@@ -688,8 +831,8 @@ export class SharePointClient {
     fieldName: string,
     searchValue: string | number | boolean | Date,
     operator = "Contains",
-    fields: SPFields<TFields>,
-    rowLimit: number,
+    fields?: Array<string | keyof TFields>,
+    rowLimit?: number,
   ) {
     await this._ensureInitialized();
 
@@ -723,7 +866,7 @@ export class SharePointClient {
         `<${operator}><FieldRef Name="${sharePointFieldName}" /><Value Type="${valueType}">${searchValue}</Value></${operator}>`;
     }
 
-    const searchOptions = {
+    const searchOptions: CamlQueryOptions<TFields> = {
       filter: filterXml,
       orderBy: { field: "Modified", ascending: false },
     };
@@ -765,9 +908,9 @@ export class SharePointClient {
   async getById<TFields extends Record<string, string>>(
     listConfig: SPListConfig<TFields>,
     itemId: number,
-    fields?: SPFields<TFields>,
-  ): Promise<SPResponse<SPFields<TFields>>> {
-    const options = {
+    fields?: Array<keyof SPFields<TFields>>,
+  ): Promise<SPResponse<SPItemData>> {
+    const options: CamlQueryOptions<TFields> = {
       filter:
         `<Eq><FieldRef Name="ID" /><Value Type="Number">${itemId}</Value></Eq>`,
     };
@@ -777,7 +920,7 @@ export class SharePointClient {
 
     const result = await this.read(listConfig, options);
 
-    if (result.success && result.data.length > 0) {
+    if (result.success && Array.isArray(result.data) && result.data.length > 0) {
       return {
         success: true,
         data: result.data[0],
@@ -823,7 +966,7 @@ export class SharePointClient {
     listConfig: SPListConfig<TFields>,
     itemId: number,
     updateData: Partial<SPFields<TFields>>,
-  ): Promise<SPResponse<SPFields<TFields>>> {
+  ): Promise<SPResponse<SPItemData>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -835,7 +978,7 @@ export class SharePointClient {
 
     return new Promise((resolve, reject) => {
       try {
-        const list = this.web.get_lists().getByTitle(listConfig.name);
+        const list = this.web!.get_lists().getByTitle(listConfig.name);
         const item = list.getItemById(itemId);
 
         Object.keys(updateData).forEach((key) => {
@@ -846,9 +989,9 @@ export class SharePointClient {
         });
 
         item.update();
-        this.context.load(item);
+        this.context!.load(item);
 
-        this.context.executeQueryAsync(
+        this.context!.executeQueryAsync(
           () => {
             const itemData = this._processItemData(item, listConfig);
             const result = {
@@ -861,13 +1004,13 @@ export class SharePointClient {
             this.tty.log(
               `Item ${itemId} updated in ${listConfig.name}`,
             );
-            resolve(result);
+            resolve(result as SPResponse<SPItemData>);
           },
-          (_sender, args) => {
+          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
             const error = {
               success: false,
-              error: args.get_message(),
-              details: args.get_stackTrace(),
+              error: args?.get_message(),
+              details: args?.get_stackTrace(),
               listName: listConfig.name,
             };
 
@@ -882,7 +1025,7 @@ export class SharePointClient {
         this.tty.logError("Error in update method", error);
         reject({
           success: false,
-          error: error.message,
+          error: (error as Error).message,
         });
       }
     });
@@ -910,7 +1053,7 @@ export class SharePointClient {
   async delete<TFields extends Record<string, string>>(
     listConfig: SPListConfig<TFields>,
     itemId: number,
-  ): Promise<SPResponse<SPFields<TFields>>> {
+  ): Promise<SPResponse<SPItemData>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);
@@ -931,16 +1074,16 @@ export class SharePointClient {
       });
     }
 
-    const previousItemData = getResult.item;
+    const previousItemData = getResult.data;
 
     return new Promise((resolve, reject) => {
       try {
-        const list = this.web.get_lists().getByTitle(listConfig.name);
+        const list = this.web!.get_lists().getByTitle(listConfig.name);
         const item = list.getItemById(itemId);
 
         item.deleteObject();
 
-        this.context.executeQueryAsync(
+        this.context!.executeQueryAsync(
           () => {
             const result = {
               success: true,
@@ -950,13 +1093,13 @@ export class SharePointClient {
             };
 
             this.tty.log(`Item ${itemId} deleted from ${listConfig.name}`);
-            resolve(result);
+            resolve(result as SPResponse<SPItemData>);
           },
-          (_sender, args) => {
+          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
             const error = {
               success: false,
-              error: args.get_message(),
-              details: args.get_stackTrace(),
+              error: args?.get_message(),
+              details: args?.get_stackTrace(),
               listName: listConfig.name,
             };
 
@@ -971,7 +1114,7 @@ export class SharePointClient {
         this.tty.logError("Error in delete method", error);
         reject({
           success: false,
-          error: error.message,
+          error: (error as Error).message,
           listName: listConfig.name,
         });
       }
