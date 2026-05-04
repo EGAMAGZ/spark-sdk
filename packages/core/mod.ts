@@ -1,5 +1,5 @@
 /**
- * @module @spark-sdk/core
+ * # @spark-sdk/core
  *
  * Core library for interacting with SharePoint lists from client-side code.
  *
@@ -64,6 +64,7 @@
  *   await client.delete(tasks, first.id as number);
  * }
  * ```
+ * @module
  */
 
 export * from './src/list-config.ts';

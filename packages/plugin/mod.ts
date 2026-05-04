@@ -1,5 +1,5 @@
 /**
- * @module @spark-sdk/vite-plugin
+ * # @spark-sdk/vite-plugin
  *
  * Vite plugin that automates the conversion of HTML pages into SharePoint-compatible ASPX layouts.
  *
@@ -60,6 +60,8 @@
  * └── assets/
  *     └── ...              ← Bundled JS/CSS
  * ```
+ *
+ * @module
  */
 
 export * from './src/plugin.ts';
