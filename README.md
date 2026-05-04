@@ -52,7 +52,25 @@ changes that could compromise usability
 
 ## Modules
 
-Spark SDK consists of two main modules:
+Spark SDK consists of three main modules:
+
+### `@spark-sdk/init`
+
+**CLI tool for scaffolding new Spark SDK projects with a pre-configured Vite +
+TypeScript template.**
+
+Quick-start experience that generates a complete project structure with Vite,
+TypeScript, and the `@spark-sdk/vite-plugin` pre-configured. Accepts the project
+name via CLI argument (`--project`, `-p`, or positional) or prompts
+interactively.
+
+```bash
+# Using JSR
+deno run -A jsr:@spark-sdk/init my-app
+
+# Or with explicit flag
+deno run -A jsr:@spark-sdk/init --project my-app
+```
 
 ### `@spark-sdk/core`
 

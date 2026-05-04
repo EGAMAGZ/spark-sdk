@@ -41,6 +41,7 @@
  * ```bash
  * cd my-app
  * deno install
+ * deno install jsr:@spark-sdk/vite-plugin
  * deno task dev
  * ```
  *
