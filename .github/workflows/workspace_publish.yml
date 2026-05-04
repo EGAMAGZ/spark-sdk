@@ -4,20 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version for the release"
+        description: 'Version for the release'
         required: true
         type: string
 
 jobs:
-
   run-tests:
-    name: "Run tests before publishing"
+    name: 'Run tests before publishing'
     uses: ./.github/workflows/test.yml
     permissions:
       contents: write
 
   check-and-lint:
-    name: "Check formatting, linting, and typing before publishing"
+    name: 'Check formatting, linting, and typing before publishing'
     needs: run-tests
     uses: ./.github/workflows/check-and-lint.yml
     permissions:
@@ -25,7 +24,7 @@ jobs:
 
   check-publishing:
     runs-on: ubuntu-latest
-    needs: [ run-tests, check-and-lint ]
+    needs: [run-tests, check-and-lint]
     timeout-minutes: 15
 
     permissions:
@@ -74,6 +73,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.version }}
-          name: "Release build - ${{ inputs.version }}"
+          name: 'Release build - ${{ inputs.version }}'
           generate_release_notes: true
           make_latest: true
