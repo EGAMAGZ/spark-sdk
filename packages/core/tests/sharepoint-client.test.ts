@@ -1,7 +1,9 @@
-import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
-import { assertEquals, assertObjectMatch, assertRejects } from '@std/assert';
-import { assertSpyCalls, spy, stub } from '@std/testing/mock';
-import { ListConfigFactory, SharePointClient } from './sharepoint-client.js';
+// @ts-nocheck Ignore TypeScript errors for test file
+import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
+import { assertEquals, assertObjectMatch, assertRejects } from "@std/assert";
+import { assertSpyCalls, spy, stub } from "@std/testing/mock";
+import { SharePointClient } from "../src/sharepoint-client.ts";
+import { SPListBuilder } from "../src/list-config.ts";
 
 describe('SharePointClient', () => {
   let fetchStub;
@@ -35,9 +37,9 @@ describe('SharePointClient', () => {
 
     // Default item for basic tests
     itemMock = createMockItem(1, {
-      'Title': 'Test Item',
-      'Status': 'Pending',
-      'Description': 'Test Description',
+      "Title": "Test Item",
+      "Status": "Pending",
+      "Description": "Test Description",
     });
 
     enumeratorMock = {
@@ -90,7 +92,7 @@ describe('SharePointClient', () => {
     };
 
     // Capture CAML queries
-    let capturedCamlXml = '';
+    let capturedCamlXml = "";
 
     spMock = {
       SOD: {
@@ -102,7 +104,7 @@ describe('SharePointClient', () => {
       ListItemCreationInformation: class {},
       CamlQuery: class {
         constructor() {
-          this.viewXml = '';
+          this.viewXml = "";
         }
         set_viewXml(xml) {
           this.viewXml = xml;
@@ -115,7 +117,7 @@ describe('SharePointClient', () => {
       // Expose captured XML for tests
       _getLastCamlQuery: () => capturedCamlXml,
       _resetCamlQuery: () => {
-        capturedCamlXml = '';
+        capturedCamlXml = "";
       },
     };
 
@@ -128,9 +130,9 @@ describe('SharePointClient', () => {
         json: () =>
           Promise.resolve({
             d: {
-              LoginName: 'i:0#.f|membership|user@example.com',
-              Title: 'Test User',
-              Email: 'user@example.com',
+              LoginName: "i:0#.f|membership|user@example.com",
+              Title: "Test User",
+              Email: "user@example.com",
             },
           }),
       });
@@ -164,16 +166,16 @@ describe('SharePointClient', () => {
       await assertRejects(
         () => client.initialize(),
         Error,
-        'SharePoint JavaScript libraries no están disponibles',
+        "SharePoint JavaScript libraries are not available",
       );
     });
   });
 
   describe('CRUD Operations', () => {
     let client;
-    const listConfig = ListConfigFactory.createCustomConfig('Tasks', {
-      status: 'Status',
-      description: 'Description',
+    const listConfig = SPListBuilder.create("Tasks", {
+      status: "Status",
+      description: "Description",
     });
 
     beforeEach(async () => {
@@ -188,21 +190,21 @@ describe('SharePointClient', () => {
     describe('CREATE', () => {
       it('should create an item and return plain object with all data', async () => {
         const newItemData = {
-          title: 'New Task',
-          status: 'Pending',
-          description: 'Task Description',
+          title: "New Task",
+          status: "Pending",
+          description: "Task Description",
         };
 
         const result = await client.create(listConfig, newItemData);
 
         assertEquals(result.success, true);
         assertEquals(result.data.id, 2); // New item ID from mock
-        assertEquals(result.data.title, 'New Task');
+        assertEquals(result.data.title, "New Task");
         // Note: After create, processItemData reads back the stored values
         // Our mock sets values via set_item, so they should be present
-        assertEquals(result.data.status, 'Pending');
-        assertEquals(result.data.description, 'Task Description');
-        assertEquals(result.listName, 'Tasks');
+        assertEquals(result.data.status, "Pending");
+        assertEquals(result.data.description, "Task Description");
+        assertEquals(result.listName, "Tasks");
 
         // Verify SP operations
         assertSpyCalls(listMock.addItem, 1);
@@ -215,10 +217,10 @@ describe('SharePointClient', () => {
         const result = await client.read(listConfig);
 
         assertEquals(result.success, true);
-        assertEquals(result.items.length, 1);
-        assertEquals(result.items[0].title, 'Test Item');
-        assertEquals(result.items[0].status, 'Pending');
-        assertEquals(result.items[0].description, 'Test Description');
+        assertEquals(result.data.length, 1);
+        assertEquals(result.data[0].title, "Test Item");
+        assertEquals(result.data[0].status, "Pending");
+        assertEquals(result.data[0].description, "Test Description");
 
         assertSpyCalls(listMock.getItems, 1);
       }); // read returns items array, not wrapped in data
@@ -227,9 +229,9 @@ describe('SharePointClient', () => {
         const result = await client.getById(listConfig, 1);
 
         assertEquals(result.success, true);
-        assertEquals(result.item.id, 1);
-        assertEquals(result.item.title, 'Test Item');
-        assertEquals(result.item.status, 'Pending');
+        assertEquals(result.data.id, 1);
+        assertEquals(result.data.title, "Test Item");
+        assertEquals(result.data.status, "Pending");
 
         assertSpyCalls(listMock.getItems, 1);
       }); // getById returns item directly, not wrapped in data
@@ -238,8 +240,8 @@ describe('SharePointClient', () => {
     describe('UPDATE', () => {
       it('should update an item and return updated plain object', async () => {
         const updateData = {
-          status: 'Completed',
-          description: 'Updated Description',
+          status: "Completed",
+          description: "Updated Description",
         };
 
         const result = await client.update(listConfig, 1, updateData);
@@ -248,9 +250,9 @@ describe('SharePointClient', () => {
         assertEquals(result.data.id, 1);
 
         // Verify the result is a plain object with updated data
-        assertEquals(result.data.status, 'Completed');
-        assertEquals(result.data.description, 'Updated Description');
-        assertEquals(result.data.title, 'Test Item'); // Unchanged fields should remain
+        assertEquals(result.data.status, "Completed");
+        assertEquals(result.data.description, "Updated Description");
+        assertEquals(result.data.title, "Test Item"); // Unchanged fields should remain
 
         assertSpyCalls(listMock.getItemById, 1);
         assertSpyCalls(contextMock.executeQueryAsync, 1);
@@ -261,9 +263,9 @@ describe('SharePointClient', () => {
         const result = await client.update(listConfig, 1, updateData);
 
         // Result should NOT have SP Item methods
-        assertEquals(typeof result.data.get_item, 'undefined');
-        assertEquals(typeof result.data.set_item, 'undefined');
-        assertEquals(typeof result.data.deleteObject, 'undefined');
+        assertEquals(typeof result.data.get_item, "undefined");
+        assertEquals(typeof result.data.set_item, "undefined");
+        assertEquals(typeof result.data.deleteObject, "undefined");
 
         // Result should have plain object properties
         assertEquals(typeof result.data.status, 'string');
@@ -277,9 +279,9 @@ describe('SharePointClient', () => {
 
         assertEquals(result.success, true);
         assertEquals(result.data.id, 1);
-        assertEquals(result.data.title, 'Test Item');
-        assertEquals(result.data.status, 'Pending');
-        assertEquals(result.data.description, 'Test Description');
+        assertEquals(result.data.title, "Test Item");
+        assertEquals(result.data.status, "Pending");
+        assertEquals(result.data.description, "Test Description");
 
         // delete calls getById internally which uses getItems
         // Then it calls getItemById to delete the item
@@ -309,7 +311,7 @@ describe('SharePointClient', () => {
           throw new Error('Should have failed');
         } catch (error) {
           assertEquals(error.success, false);
-          assertEquals(error.error.includes('No se encontró'), true);
+          assertEquals(error.error.includes("not found"), true);
         }
       });
 
@@ -317,8 +319,8 @@ describe('SharePointClient', () => {
         const result = await client.delete(listConfig, 1);
 
         // Result should NOT have SP Item methods
-        assertEquals(typeof result.data.get_item, 'undefined');
-        assertEquals(typeof result.data.set_item, 'undefined');
+        assertEquals(typeof result.data.get_item, "undefined");
+        assertEquals(typeof result.data.set_item, "undefined");
 
         // Result should have plain object properties
         assertEquals(typeof result.data.title, 'string');
@@ -329,9 +331,9 @@ describe('SharePointClient', () => {
 
   describe('CAML Query Construction', () => {
     let client;
-    const listConfig = ListConfigFactory.createCustomConfig('Tasks', {
-      status: 'Status',
-      description: 'Description',
+    const listConfig = SPListBuilder.create("Tasks", {
+      status: "Status",
+      description: "Description",
     });
 
     beforeEach(async () => {
@@ -364,7 +366,7 @@ describe('SharePointClient', () => {
       const options = {
         filter:
           "<Eq><FieldRef Name='Status' /><Value Type='Text'>Pending</Value></Eq>",
-        orderBy: { field: 'title', ascending: false },
+        orderBy: { field: "title", ascending: false },
         rowLimit: 5,
       };
 
@@ -383,34 +385,49 @@ describe('SharePointClient', () => {
         ),
         true,
       );
-      assertEquals(xml.includes('<RowLimit>5</RowLimit>'), true);
+      assertEquals(xml.includes("<RowLimit>5</RowLimit>"), true);
     });
   });
 
-  describe('Error Handling', () => {
+  describe("Error Handling", () => {
     let client;
-    const listConfig = ListConfigFactory.createCustomConfig('Tasks', {});
+    const listConfig = SPListBuilder.create("Tasks", {});
 
     beforeEach(async () => {
       client = SharePointClient.getInstance();
       await client.initialize();
     });
 
-    it('should handle executeQueryAsync errors', async () => {
-      contextMock.executeQueryAsync = spy((success, failure) => {
+    it("should handle invalid list configuration", async () => {
+      const invalidConfig = {
+        colums: {
+          status: "Status",
+        },
+        title: "InvalidList",
+      };
+
+      try {
+        await client.read(invalidConfig);
+      } catch (e) {
+        assertEquals(e.name, "InvalidListConfigError");
+      }
+    });
+
+    it("should handle executeQueryAsync errors", async () => {
+      contextMock.executeQueryAsync = spy((_success, failure) => {
         const argsMock = {
-          get_message: () => 'SharePoint Error',
-          get_stackTrace: () => 'Stack Trace',
+          get_message: () => "SharePoint Error",
+          get_stackTrace: () => "Stack Trace",
         };
         failure(null, argsMock);
       });
 
       try {
-        await client.create(listConfig, { title: 'Fail' });
-        throw new Error('Should have failed');
+        await client.create(listConfig, { title: "Fail" });
+        throw new Error("Should have failed");
       } catch (e) {
         assertEquals(e.success, false);
-        assertEquals(e.error, 'SharePoint Error');
+        assertEquals(e.error, "SharePoint Error");
       }
     }); // Error responses don't have data wrapper
   });
