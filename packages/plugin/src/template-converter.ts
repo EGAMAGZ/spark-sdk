@@ -22,13 +22,6 @@ const REGISTER_DIRECTIVES =
  *
  * @param value - The input string to process.
  * @returns The string with leading slashes removed.
- *
- * @example
- * ```ts
- * stripLeadingSlashes('/assets/image.png'); // 'assets/image.png'
- * stripLeadingSlashes('//assets/image.png'); // 'assets/image.png'
- * stripLeadingSlashes('assets/image.png'); // 'assets/image.png'
- * ```
  */
 function stripLeadingSlashes(value: string): string {
   return value.replace(/^\/+/, '');
