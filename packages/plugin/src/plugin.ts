@@ -5,6 +5,15 @@ import { join } from 'node:path';
 import process from 'node:process';
 import { readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 
+/**
+ * Scans the `pages/` directory under the given root path and returns a
+ * record mapping page names to their full file paths.
+ *
+ * Only `.html` files are included; `index.html` is excluded.
+ *
+ * @param root Project root directory path.
+ * @returns Record where keys are page names (without extension) and values are absolute file paths.
+ */
 function getHtmlFiles(root: string) {
   const pagesDir = 'pages';
   const fullPath = join(root, pagesDir);
@@ -23,6 +32,30 @@ function getHtmlFiles(root: string) {
   }
 }
 
+/**
+ * Creates a Vite plugin that automates the conversion of HTML pages into
+ * SharePoint-compatible ASPX layouts during the build process.
+ *
+ * The plugin performs two main tasks:
+ * 1. **Configuration phase** — Discovers HTML files in the `pages/` directory
+ *    and adds them as Rollup input entries so they are bundled as separate pages.
+ * 2. **Build phase** — After the build completes, converts each generated `.html`
+ *    file in `dist/pages/` to `.aspx` format with SharePoint directives and
+ *    content placeholders, then removes the original `.html` files.
+ *
+ * @returns Array of Vite plugin objects to be used in Vite configuration.
+ *
+ * @example
+ * ```ts
+ * // vite.config.ts
+ * import { defineConfig } from 'vite';
+ * import { spark } from '@spark-sdk/vite-plugin';
+ *
+ * export default defineConfig({
+ *   plugins: [spark()],
+ * });
+ * ```
+ */
 export function spark(): Plugin[] {
   let _config: ResolvedConfig;
 

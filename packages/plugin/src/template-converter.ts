@@ -1,3 +1,10 @@
+/**
+ * Represents external assets extracted from an HTML document's `<head>` section.
+ *
+ * @property link - Array of `<link>` tag strings for stylesheets and other linked resources.
+ * @property script - Array of `<script>` tag strings for external JavaScript files.
+ * @property style - Array of `<style>` tag strings for inline CSS styles.
+ */
 type ExternalAssets = {
   link: string[];
   script: string[];
@@ -10,6 +17,19 @@ const PAGE_DIRECTIVE =
 const REGISTER_DIRECTIVES =
   `<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> <%@ Import Namespace="Microsoft.SharePoint" %> <%@ Assembly Name="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>`;
 
+/**
+ * Removes leading slash characters from the beginning of a string.
+ *
+ * @param value - The input string to process.
+ * @returns The string with leading slashes removed.
+ *
+ * @example
+ * ```ts
+ * stripLeadingSlashes('/assets/image.png'); // 'assets/image.png'
+ * stripLeadingSlashes('//assets/image.png'); // 'assets/image.png'
+ * stripLeadingSlashes('assets/image.png'); // 'assets/image.png'
+ * ```
+ */
 function stripLeadingSlashes(value: string): string {
   return value.replace(/^\/+/, '');
 }
