@@ -11,7 +11,11 @@
 
 > _Proof that SharePoint Classic and modern technologies still have a place
 > today._
+[![JSR Scope](https://jsr.io/badges/@spark-sdk)](https://jsr.io/@spark-sdk)
+![GitHub License](https://img.shields.io/github/license/egamagz/spark-sdk)
+![GitHub Release](https://img.shields.io/github/v/release/egamagz/spark-sdk)
 
+Check the [Documentation](https://jsr.io/@spark-sdk) in JSR
 ---
 
 ## Why did I create this?
