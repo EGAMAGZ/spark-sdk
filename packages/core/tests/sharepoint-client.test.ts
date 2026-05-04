@@ -5,7 +5,7 @@ import { assertSpyCalls, spy, stub } from "@std/testing/mock";
 import { SharePointClient } from "../src/sharepoint-client.ts";
 import { SPListBuilder } from "../src/list-config.ts";
 
-describe("SharePointClient", () => {
+describe('SharePointClient', () => {
   let fetchStub;
   let spMock;
   let contextMock;
@@ -66,7 +66,7 @@ describe("SharePointClient", () => {
       getItems: spy(() => itemsMock),
       getItemById: spy((id) => {
         if (id === 1) return itemMock;
-        return createMockItem(id, { "Title": "Fetched Item" });
+        return createMockItem(id, { 'Title': 'Fetched Item' });
       }),
       getByTitle: function () {
         return this;
@@ -78,7 +78,7 @@ describe("SharePointClient", () => {
     };
 
     webMock = {
-      get_url: () => "https://example.sharepoint.com/sites/test",
+      get_url: () => 'https://example.sharepoint.com/sites/test',
       get_lists: () => listsMock,
     };
 
@@ -124,7 +124,7 @@ describe("SharePointClient", () => {
     globalThis.SP = spMock;
 
     // Mock fetch for user data
-    fetchStub = stub(globalThis, "fetch", () => {
+    fetchStub = stub(globalThis, 'fetch', () => {
       return Promise.resolve({
         ok: true,
         json: () =>
@@ -144,23 +144,23 @@ describe("SharePointClient", () => {
     delete globalThis.SP;
   });
 
-  describe("Singleton & Initialization", () => {
-    it("should create a singleton instance", () => {
+  describe('Singleton & Initialization', () => {
+    it('should create a singleton instance', () => {
       const client1 = SharePointClient.getInstance();
       const client2 = SharePointClient.getInstance();
       assertEquals(client1, client2);
     });
 
-    it("should initialize correctly", async () => {
+    it('should initialize correctly', async () => {
       const client = SharePointClient.getInstance();
       await client.initialize();
 
       assertEquals(client.isInitialized, true);
-      assertObjectMatch(client.user, { Title: "Test User" });
+      assertObjectMatch(client.user, { Title: 'Test User' });
       assertSpyCalls(fetchStub, 1);
     });
 
-    it("should handle initialization errors if SP is missing", async () => {
+    it('should handle initialization errors if SP is missing', async () => {
       delete globalThis.SP;
       const client = SharePointClient.getInstance();
       await assertRejects(
@@ -171,7 +171,7 @@ describe("SharePointClient", () => {
     });
   });
 
-  describe("CRUD Operations", () => {
+  describe('CRUD Operations', () => {
     let client;
     const listConfig = SPListBuilder.create("Tasks", {
       status: "Status",
@@ -187,8 +187,8 @@ describe("SharePointClient", () => {
       contextMock.load = spy();
     });
 
-    describe("CREATE", () => {
-      it("should create an item and return plain object with all data", async () => {
+    describe('CREATE', () => {
+      it('should create an item and return plain object with all data', async () => {
         const newItemData = {
           title: "New Task",
           status: "Pending",
@@ -212,8 +212,8 @@ describe("SharePointClient", () => {
       });
     });
 
-    describe("READ", () => {
-      it("should retrieve items", async () => {
+    describe('READ', () => {
+      it('should retrieve items', async () => {
         const result = await client.read(listConfig);
 
         assertEquals(result.success, true);
@@ -225,7 +225,7 @@ describe("SharePointClient", () => {
         assertSpyCalls(listMock.getItems, 1);
       }); // read returns items array, not wrapped in data
 
-      it("getById should retrieve a single item as plain object", async () => {
+      it('getById should retrieve a single item as plain object', async () => {
         const result = await client.getById(listConfig, 1);
 
         assertEquals(result.success, true);
@@ -237,8 +237,8 @@ describe("SharePointClient", () => {
       }); // getById returns item directly, not wrapped in data
     });
 
-    describe("UPDATE", () => {
-      it("should update an item and return updated plain object", async () => {
+    describe('UPDATE', () => {
+      it('should update an item and return updated plain object', async () => {
         const updateData = {
           status: "Completed",
           description: "Updated Description",
@@ -258,8 +258,8 @@ describe("SharePointClient", () => {
         assertSpyCalls(contextMock.executeQueryAsync, 1);
       });
 
-      it("should NOT return the SP Item object, but plain data", async () => {
-        const updateData = { status: "Done" };
+      it('should NOT return the SP Item object, but plain data', async () => {
+        const updateData = { status: 'Done' };
         const result = await client.update(listConfig, 1, updateData);
 
         // Result should NOT have SP Item methods
@@ -268,12 +268,12 @@ describe("SharePointClient", () => {
         assertEquals(typeof result.data.deleteObject, "undefined");
 
         // Result should have plain object properties
-        assertEquals(typeof result.data.status, "string");
+        assertEquals(typeof result.data.status, 'string');
       });
     });
 
-    describe("DELETE", () => {
-      it("should return the previous item data before deletion", async () => {
+    describe('DELETE', () => {
+      it('should return the previous item data before deletion', async () => {
         // itemMock has initial data
         const result = await client.delete(listConfig, 1);
 
@@ -290,7 +290,7 @@ describe("SharePointClient", () => {
         assertSpyCalls(itemMock.deleteObject, 1);
       });
 
-      it("should fail if item does not exist", async () => {
+      it('should fail if item does not exist', async () => {
         // Mock getItems to return empty list
         const emptyEnumerator = {
           _items: [],
@@ -308,14 +308,14 @@ describe("SharePointClient", () => {
 
         try {
           await client.delete(listConfig, 999);
-          throw new Error("Should have failed");
+          throw new Error('Should have failed');
         } catch (error) {
           assertEquals(error.success, false);
           assertEquals(error.error.includes("not found"), true);
         }
       });
 
-      it("should return plain object, not SP Item", async () => {
+      it('should return plain object, not SP Item', async () => {
         const result = await client.delete(listConfig, 1);
 
         // Result should NOT have SP Item methods
@@ -323,13 +323,13 @@ describe("SharePointClient", () => {
         assertEquals(typeof result.data.set_item, "undefined");
 
         // Result should have plain object properties
-        assertEquals(typeof result.data.title, "string");
-        assertEquals(typeof result.data.status, "string");
+        assertEquals(typeof result.data.title, 'string');
+        assertEquals(typeof result.data.status, 'string');
       });
     });
   });
 
-  describe("CAML Query Construction", () => {
+  describe('CAML Query Construction', () => {
     let client;
     const listConfig = SPListBuilder.create("Tasks", {
       status: "Status",
@@ -343,7 +343,7 @@ describe("SharePointClient", () => {
     });
 
     it("search with 'Eq' operator generates correct CAML", async () => {
-      await client.search(listConfig, "status", "Pending", "Eq");
+      await client.search(listConfig, 'status', 'Pending', 'Eq');
       const xml = globalThis.SP._getLastCamlQuery();
       const expected =
         '<Eq><FieldRef Name="Status" /><Value Type="Text">Pending</Value></Eq>';
@@ -355,14 +355,14 @@ describe("SharePointClient", () => {
     });
 
     it("search with 'Contains' operator", async () => {
-      await client.search(listConfig, "description", "Task", "Contains");
+      await client.search(listConfig, 'description', 'Task', 'Contains');
       const xml = globalThis.SP._getLastCamlQuery();
       const expected =
         '<Contains><FieldRef Name="Description" /><Value Type="Text">Task</Value></Contains>';
       assertEquals(xml.includes(expected), true);
     });
 
-    it("read with filter, orderBy, and rowLimit", async () => {
+    it('read with filter, orderBy, and rowLimit', async () => {
       const options = {
         filter:
           "<Eq><FieldRef Name='Status' /><Value Type='Text'>Pending</Value></Eq>",

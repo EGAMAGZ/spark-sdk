@@ -1,5 +1,9 @@
 {
   "name": "@spark-sdk/vite-plugin",
   "version": "0.0.1",
-  "exports": "./mod.ts"
+  "exports": "./mod.ts",
+  "imports": {
+    "vite": "npm:vite",
+    "vitest": "npm:vitest"
+  }
 }

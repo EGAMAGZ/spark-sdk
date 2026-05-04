@@ -1,15 +1,37 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "example:build": "cd example/vite-ts && deno task build",
+    "example:dev": "cd example/vite-ts && deno task dev"
   },
+  "nodeModulesDir": "auto",
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
-    "@std/expect": "jsr:@std/expect@^1.0.19",
-    "@std/testing": "jsr:@std/testing@^1.0.18"
+    "@std/expect": "jsr:@std/expect@^1.0.18",
+    "@std/testing": "jsr:@std/testing@^1.0.17",
+    "vite": "npm:vite"
+  },
+  "dependencies": {
+    "npm:vite": "^8.0.8",
+    "npm:vitest": "^4.1.4"
   },
   "workspace": [
     "packages/core",
     "packages/init",
-    "packages/plugin"
-  ]
+    "packages/plugin",
+    "example/vite-ts"
+  ],
+  "fmt": {
+    "singleQuote": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended", "jsr", "workspace"]
+    }
+  },
+  "publish": {
+    "exclude": [
+      "tests/",
+      ".github/"
+    ]
+  }
 }
