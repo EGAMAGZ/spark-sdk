@@ -3,27 +3,28 @@ import { convertHtmlToAspx } from '../src/template-converter.ts';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
-import { readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+import { readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 
 function getHtmlFiles(root: string) {
   const pagesDir = 'pages';
   const fullPath = join(root, pagesDir);
   try {
     const files = readdirSync(fullPath);
-    const htmlFiles = files.filter((file) => file.endsWith('.html') && file !== 'index.html');
+    const htmlFiles = files.filter((file) =>
+      file.endsWith('.html') && file !== 'index.html'
+    );
     return htmlFiles.reduce((acc, file) => {
       const name = file.replace('.html', '');
       acc[name] = join(fullPath, file);
       return acc;
     }, {} as Record<string, string>);
   } catch {
-    // If pages directory doesn't exist, return empty
     return {};
   }
 }
 
 export function spark(): Plugin[] {
-  let config: ResolvedConfig;
+  let _config: ResolvedConfig;
 
   return [
     {
@@ -44,7 +45,7 @@ export function spark(): Plugin[] {
       name: 'spark:build',
       apply: 'build',
       configResolved(resolvedConfig: ResolvedConfig) {
-        config = resolvedConfig;
+        _config = resolvedConfig;
       },
       writeBundle(options, _bundle) {
         const outDir = options.dir || 'dist';
@@ -59,7 +60,9 @@ export function spark(): Plugin[] {
             const aspxPath = htmlPath.replace('.html', '.aspx');
             writeFileSync(aspxPath, aspxContent);
             unlinkSync(htmlPath);
-            console.log(`Converted ${file} to ${file.replace('.html', '.aspx')}`);
+            console.log(
+              `Converted ${file} to ${file.replace('.html', '.aspx')}`,
+            );
           }
         } catch (error) {
           console.error('Error in spark plugin writeBundle:', error);

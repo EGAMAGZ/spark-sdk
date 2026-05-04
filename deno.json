@@ -31,7 +31,8 @@
   "publish": {
     "exclude": [
       "tests/",
-      ".github/"
+      ".github/",
+      "example/"
     ]
   }
 }

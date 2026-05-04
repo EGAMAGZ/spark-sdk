@@ -31,7 +31,7 @@ export class TTY {
    * @param options Configuration options for the logger
    */
   constructor(
-    { enabled = true, label = "SharePointClient" }: TTYOptions = {},
+    { enabled = true, label = 'SharePointClient' }: TTYOptions = {},
   ) {
     this.enabled = enabled;
     this.label = label;
@@ -58,14 +58,14 @@ export class TTY {
    * @param args Additional arguments to include in the output
    */
   private write(
-    method: "log" | "error",
+    method: 'log' | 'error',
     message: string,
     args: unknown[],
   ): void {
     if (!this.enabled) return;
 
     const prefix = this.getPrefix();
-    const icon = method === "error" ? "❌ " : "";
+    const icon = method === 'error' ? '❌ ' : '';
 
     // deno-lint-ignore no-console
     console[method](`${prefix} ${icon}${message}`, ...args);
@@ -78,7 +78,7 @@ export class TTY {
    * @param args Additional arguments to log alongside the message
    */
   log(message: string, ...args: unknown[]): void {
-    this.write("log", message, args);
+    this.write('log', message, args);
   }
 
   /**
@@ -88,6 +88,6 @@ export class TTY {
    * @param args Additional arguments to log alongside the error
    */
   logError(message: string, ...args: unknown[]): void {
-    this.write("error", message, args);
+    this.write('error', message, args);
   }
 }
