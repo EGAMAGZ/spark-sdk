@@ -17,8 +17,7 @@
   "workspace": [
     "packages/core",
     "packages/init",
-    "packages/plugin",
-    "example/vite-ts"
+    "packages/plugin"
   ],
   "fmt": {
     "singleQuote": true

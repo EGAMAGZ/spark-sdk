@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import { spark } from '@spark-sdk/vite-plugin';
+import { spark } from '../../packages/plugin/mod.ts';
 
 export default defineConfig({
   plugins: [
