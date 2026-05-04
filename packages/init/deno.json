@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "exports": "./mod.ts",
   "imports": {
-    "@std/cli": "jsr:@std/cli"
+    "@std/cli": "jsr:@std/cli",
+    "@std/path": "jsr:@std/path",
+    "@std/fs": "jsr:@std/fs"
   }
 }

@@ -7,9 +7,11 @@
     "jsr:@std/cli@*": "1.0.24",
     "jsr:@std/data-structures@^1.0.11": "1.0.11",
     "jsr:@std/expect@^1.0.18": "1.0.19",
+    "jsr:@std/fs@*": "1.0.23",
     "jsr:@std/fs@^1.0.23": "1.0.23",
     "jsr:@std/internal@^1.0.12": "1.0.13",
     "jsr:@std/internal@^1.0.13": "1.0.13",
+    "jsr:@std/path@*": "1.1.4",
     "jsr:@std/path@^1.1.4": "1.1.4",
     "jsr:@std/testing@^1.0.17": "1.0.18",
     "npm:typescript@~5.8.3": "5.8.3",
@@ -41,13 +43,13 @@
       "dependencies": [
         "jsr:@std/assert@^1.0.19",
         "jsr:@std/internal@^1.0.13",
-        "jsr:@std/path"
+        "jsr:@std/path@^1.1.4"
       ]
     },
     "@std/fs@1.0.23": {
       "integrity": "3ecbae4ce4fee03b180fa710caff36bb5adb66631c46a6460aaad49515565a37",
       "dependencies": [
-        "jsr:@std/path"
+        "jsr:@std/path@^1.1.4"
       ]
     },
     "@std/internal@1.0.13": {
@@ -65,9 +67,9 @@
         "jsr:@std/assert@^1.0.19",
         "jsr:@std/async",
         "jsr:@std/data-structures",
-        "jsr:@std/fs",
+        "jsr:@std/fs@^1.0.23",
         "jsr:@std/internal@^1.0.13",
-        "jsr:@std/path"
+        "jsr:@std/path@^1.1.4"
       ]
     }
   },
@@ -635,7 +637,9 @@
       },
       "packages/init": {
         "dependencies": [
-          "jsr:@std/cli@*"
+          "jsr:@std/cli@*",
+          "jsr:@std/fs@*",
+          "jsr:@std/path@*"
         ]
       },
       "packages/plugin": {
