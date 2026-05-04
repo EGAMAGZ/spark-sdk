@@ -86,7 +86,7 @@ describe('SharePointClient', () => {
       get_site: () => ({}),
       get_web: () => webMock,
       load: spy(),
-      executeQueryAsync: spy((success, failure) => {
+      executeQueryAsync: spy((success, _failure) => {
         if (success) success();
       }),
     };
@@ -96,7 +96,7 @@ describe('SharePointClient', () => {
 
     spMock = {
       SOD: {
-        executeFunc: (script, className, callback) => callback(),
+        executeFunc: (_script, _className, callback) => callback(),
       },
       ClientContext: {
         get_current: () => contextMock,
@@ -183,7 +183,7 @@ describe('SharePointClient', () => {
       await client.initialize();
 
       // Reset spies after initialization
-      contextMock.executeQueryAsync = spy((success, failure) => success());
+      contextMock.executeQueryAsync = spy((success, _failure) => success());
       contextMock.load = spy();
     });
 

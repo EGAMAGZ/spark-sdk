@@ -6,10 +6,6 @@ import {
 import { TTY } from './tty.ts';
 import { InvalidListConfigError } from './exceptions.ts';
 
-declare global {
-  var SP: SPNamespace;
-}
-
 /**
  * SharePoint field value types - can be primitives, objects, or arrays
  */
@@ -172,9 +168,7 @@ export interface SPCamlQuery {
 /**
  * Contains information required to create a new SharePoint list item.
  */
-export interface SPListItemCreationInformation {
-  // Marker interface
-}
+export type SPListItemCreationInformation = unknown;
 
 /**
  * Event arguments for failed SharePoint operations, providing error message and stack trace details.
@@ -422,16 +416,18 @@ export class SharePointClient {
    */
   private _initializeSharePointContext(): Promise<SPContextData> {
     return new Promise((resolve, reject) => {
-      if (typeof globalThis.SP === 'undefined' || !globalThis.SP.SOD) {
+      // deno-lint-ignore no-explicit-any
+      const sp: SPNamespace = (globalThis as any).SP;
+      if (typeof sp === 'undefined' || !sp.SOD) {
         reject(
           new Error('SharePoint JavaScript libraries are not available'),
         );
         return;
       }
 
-      globalThis.SP.SOD.executeFunc('sp.js', 'SP.ClientContext', () => {
+      sp.SOD.executeFunc('sp.js', 'SP.ClientContext', () => {
         try {
-          const context = globalThis.SP.ClientContext.get_current();
+          const context = sp.ClientContext.get_current();
           const site = context.get_site();
           const web = context.get_web();
           context.load(web);
@@ -538,7 +534,9 @@ export class SharePointClient {
     options: CamlQueryOptions<TFields>,
     listConfig: SPListConfig<TFields>,
   ): SPCamlQuery {
-    const camlQuery = new globalThis.SP.CamlQuery();
+    // deno-lint-ignore no-explicit-any
+    const sp: SPNamespace = (globalThis as any).SP;
+    const camlQuery = new sp.CamlQuery();
     let queryXml = '<View>';
 
     if (options.fields && options.fields.length > 0) {
@@ -643,7 +641,7 @@ export class SharePointClient {
    * console.log(user);
    * ```
    */
-  get userInfo() {
+  get userInfo(): { user: SPUser | null } {
     return {
       user: this.user,
     };
@@ -692,8 +690,10 @@ export class SharePointClient {
 
     return new Promise((resolve, reject) => {
       try {
+        // deno-lint-ignore no-explicit-any
+        const sp: SPNamespace = (globalThis as any).SP;
         const list = this.web!.get_lists().getByTitle(listConfig.name);
-        const listItemCreationInfo = new globalThis.SP
+        const listItemCreationInfo = new sp
           .ListItemCreationInformation();
         const newItem = list.addItem(listItemCreationInfo);
 
@@ -978,7 +978,7 @@ export class SharePointClient {
     operator = 'Contains',
     fields?: Array<string | keyof TFields>,
     rowLimit?: number,
-  ) {
+  ): Promise<SPResponse<SPItemData[]>> {
     await this._ensureInitialized();
 
     const validatedConfig = validateListConfig(listConfig);

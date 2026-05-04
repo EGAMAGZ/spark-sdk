@@ -19,13 +19,12 @@ function getHtmlFiles(root: string) {
       return acc;
     }, {} as Record<string, string>);
   } catch {
-    // If pages directory doesn't exist, return empty
     return {};
   }
 }
 
 export function spark(): Plugin[] {
-  let config: ResolvedConfig;
+  let _config: ResolvedConfig;
 
   return [
     {
@@ -46,7 +45,7 @@ export function spark(): Plugin[] {
       name: 'spark:build',
       apply: 'build',
       configResolved(resolvedConfig: ResolvedConfig) {
-        config = resolvedConfig;
+        _config = resolvedConfig;
       },
       writeBundle(options, _bundle) {
         const outDir = options.dir || 'dist';
