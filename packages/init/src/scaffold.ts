@@ -2,7 +2,7 @@ import { dirname, join } from '@std/path';
 import { ensureDirSync } from '@std/fs/ensure-dir';
 import { existsSync } from '@std/fs/exists';
 import { MINT, RESET } from './colors.ts';
-import { getTemplateFiles, type TemplateFile } from './template.ts';
+import { getTemplateFiles } from './template.ts';
 
 export function scaffoldProject(name: string): void {
   const absPath = Deno.realPathSync('.');
