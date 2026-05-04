@@ -13,23 +13,44 @@ declare global {
 /**
  * SharePoint field value types - can be primitives, objects, or arrays
  */
-type SPFieldValue = string | number | boolean | Date | SPFieldLookupValue | SPFieldUserValue | SPFieldValue[] | null | undefined;
+export type SPFieldValue =
+  | string
+  | number
+  | boolean
+  | Date
+  | SPFieldLookupValue
+  | SPFieldUserValue
+  | SPFieldValue[]
+  | null
+  | undefined;
 
 /**
  * Processed field value after reading from SharePoint (dates as strings, lookups as values)
  */
-type SPProcessedFieldValue = string | number | boolean | string[] | null | undefined;
+export type SPProcessedFieldValue =
+  | string
+  | number
+  | boolean
+  | string[]
+  | null
+  | undefined;
 
 /**
  * Processed item data from SharePoint
  */
-type SPItemData = Record<string, SPProcessedFieldValue>;
+export type SPItemData = Record<string, SPProcessedFieldValue>;
 
-interface SPFieldLookupValue {
+/**
+ * Represents the configuration for a SharePoint list, including its name and field mappings.
+ */
+export interface SPFieldLookupValue {
   get_lookupValue(): string | number;
 }
 
-interface SPFieldUserValue {
+/**
+ * Represents the configuration for a SharePoint list, including its name and field mappings.
+ */
+export interface SPFieldUserValue {
   get_loginName(): string;
   get_lookupValue(): number;
 }
@@ -37,16 +58,29 @@ interface SPFieldUserValue {
 /**
  * Base type for any SharePoint object that can be loaded
  */
-type SPObject = SPSite | SPWeb | SPList | SPListItem | SPListItemCollection | SPListItemEnumerator;
+export type SPObject =
+  | SPSite
+  | SPWeb
+  | SPList
+  | SPListItem
+  | SPListItemCollection
+  | SPListItemEnumerator;
 
 /**
  * SharePoint callback argument types
  */
-type SPQueryAsyncSuccessArgs = undefined;
+export type SPQueryAsyncSuccessArgs = undefined;
 
-interface SPNamespace {
+/**
+ * Represents the structure of the SharePoint JavaScript API namespace, including methods for loading libraries and accessing core objects like ClientContext, CamlQuery, and ListItemCreationInformation.
+ */
+export interface SPNamespace {
   SOD: {
-    executeFunc(libName: string, functionName: string, callback: () => void): void;
+    executeFunc(
+      libName: string,
+      functionName: string,
+      callback: () => void,
+    ): void;
   };
   ClientContext: {
     get_current(): SPClientContext;
@@ -54,38 +88,58 @@ interface SPNamespace {
   CamlQuery: new () => SPCamlQuery;
   ListItemCreationInformation: new () => SPListItemCreationInformation;
 }
-
-interface SPClientContext {
+/**
+ * Represents the client context for interacting with SharePoint.
+ */
+export interface SPClientContext {
   get_site(): SPSite;
   get_web(): SPWeb;
   load(obj: SPObject): void;
   executeQueryAsync(
-    onSuccess: (sender?: SPClientContext, args?: SPQueryAsyncSuccessArgs) => void,
+    onSuccess: (
+      sender?: SPClientContext,
+      args?: SPQueryAsyncSuccessArgs,
+    ) => void,
     onFailure?: (sender?: SPClientContext, args?: SPFailedEventArgs) => void,
   ): void;
 }
 
-interface SPSite {
+/**
+ * Represents a SharePoint site, which is the top-level container for content and functionality.
+ */
+export interface SPSite {
   get_url(): string;
 }
 
-interface SPWeb {
+/**
+ * Represents a SharePoint web (subsite), which contains lists, libraries, and other content.
+ */
+export interface SPWeb {
   get_url(): string;
   get_lists(): SPListCollection;
 }
 
-interface SPListCollection {
+/**
+ * Represents a collection of SharePoint lists within a web.
+ */
+export interface SPListCollection {
   getByTitle(title: string): SPList;
 }
 
-interface SPList {
+/**
+ * Represents a SharePoint list, which is a collection of items with similar structure.
+ */
+export interface SPList {
   get_title(): string;
   addItem(itemCreationInfo: SPListItemCreationInformation): SPListItem;
   getItemById(id: number): SPListItem;
   getItems(query: SPCamlQuery): SPListItemCollection;
 }
 
-interface SPListItem {
+/**
+ * Represents an item in a SharePoint list, containing field values and metadata.
+ */
+export interface SPListItem {
   get_id(): number;
   get_item(fieldName: string): SPFieldValue;
   set_item(fieldName: string, value: SPFieldValue): void;
@@ -93,36 +147,57 @@ interface SPListItem {
   deleteObject(): void;
 }
 
-interface SPListItemCollection {
+/**
+ * Represents a collection of SharePoint list items returned from a query.
+ */
+export interface SPListItemCollection {
   getEnumerator(): SPListItemEnumerator;
 }
 
-interface SPListItemEnumerator {
+/**
+ * Provides enumeration capabilities for iterating through a collection of list items.
+ */
+export interface SPListItemEnumerator {
   moveNext(): boolean;
   get_current(): SPListItem;
 }
 
-interface SPCamlQuery {
+/**
+ * Represents a Collaborative Application Markup Language (CAML) query used to filter and retrieve SharePoint list items.
+ */
+export interface SPCamlQuery {
   set_viewXml(xml: string): void;
 }
 
-interface SPListItemCreationInformation {
+/**
+ * Contains information required to create a new SharePoint list item.
+ */
+export interface SPListItemCreationInformation {
   // Marker interface
 }
 
-interface SPFailedEventArgs {
+/**
+ * Event arguments for failed SharePoint operations, providing error message and stack trace details.
+ */
+export interface SPFailedEventArgs {
   get_message(): string;
   get_stackTrace(): string;
 }
 
-interface SPContextData {
+/**
+ * Context data for the SharePoint client
+ */
+export interface SPContextData {
   current: SPClientContext;
   site: SPSite;
   web: SPWeb;
   user: SPUser;
 }
 
-interface CamlQueryOptions<TFields extends Record<string, string>> {
+/**
+ * Options for building a CAML query, allowing selection of fields, filtering, ordering, and row limits.
+ */
+export interface CamlQueryOptions<TFields extends Record<string, string>> {
   fields?: Array<string | keyof TFields>;
   filter?: string;
   orderBy?: {
@@ -132,6 +207,9 @@ interface CamlQueryOptions<TFields extends Record<string, string>> {
   rowLimit?: number;
 }
 
+/**
+ * Type representing the response from SharePoint API calls
+ */
 export type SPResponse<T> =
   | {
     success: true;
@@ -154,29 +232,74 @@ const DEFAULT_HEADERS = {
   "Accept": "application/json;odata=verbose",
 };
 
-interface SharePointClientOptions {
+/**
+ * Type representing the fields of a SharePoint list item based on the list configuration.
+ */
+export interface SharePointClientOptions {
   enableLogging?: boolean;
 }
 
-interface SPUser {
+/**
+ * SharePoint user information
+ */
+export interface SPUser {
+  /**
+   * User ID in SharePoint - corresponds to the "ID" field in user information
+   */
   Id: number;
+  /**
+   * User login name - corresponds to the "LoginName" field in user information
+   */
   LoginName: string;
+  /**
+   * User display name - corresponds to the "Title" field in user information
+   */
   Title: string;
+  /**
+   * User email - corresponds to the "Email" field in user information
+   */
   Email: string;
 }
 
 export class SharePointClient {
+  /**
+   * TTY instance for logging
+   */
   tty!: TTY;
+  /**
+   * Singleton instance of SharePointClient
+   */
   static _instance: SharePointClient | null = null;
+  /**
+   * Context object representing the current SharePoint context, used for all operations
+   */
   context: SPClientContext | null = null;
+  /**
+   * Site object representing the current SharePoint site, used for list operations
+   */
   site: SPSite | null = null;
+  /**
+   * Web object representing the current SharePoint site, used for list operations
+   */
   web: SPWeb | null = null;
 
+  /**
+   * Global options for the client
+   */
   options: SharePointClientOptions = {
     enableLogging: true,
   };
+  /**
+   * Initialization state of the client
+   */
   isInitialized: boolean = false;
+  /**
+   * Initialization promise to prevent multiple concurrent initializations
+   */
   initializationPromise: Promise<SharePointClient> | null = null;
+  /**
+   * Current SharePoint user information
+   */
   user: SPUser | null = null;
 
   constructor() {
@@ -257,12 +380,14 @@ export class SharePointClient {
 
   /**
    * Performs the actual initialization
+   * @returns Promise that resolves with the initialized instance
    */
   private async _performInitialization() {
     try {
       this.tty.log("Initializing SharePoint context...");
 
-      const contextData: SPContextData = await this._initializeSharePointContext();
+      const contextData: SPContextData = await this
+        ._initializeSharePointContext();
 
       this.context = contextData.current;
       this.site = contextData.site;
@@ -293,6 +418,7 @@ export class SharePointClient {
 
   /**
    * Initializes the SharePoint context
+   * @returns Promise that resolves with the context data
    */
   private _initializeSharePointContext(): Promise<SPContextData> {
     return new Promise((resolve, reject) => {
@@ -326,7 +452,10 @@ export class SharePointClient {
             }
           };
 
-          const onFailure = (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
+          const onFailure = (
+            _sender: SPClientContext | undefined,
+            args: SPFailedEventArgs | undefined,
+          ) => {
             const error = new Error(
               `SharePoint context query failed: ${args?.get_message()}`,
             );
@@ -346,6 +475,7 @@ export class SharePointClient {
   /**
    * Fetches current user data
    * @param baseUrl - Base URL of the SharePoint site
+   * @returns User data or null if fetching fails
    */
   private async _getUserData(baseUrl: string) {
     const url = new URL(baseUrl);
@@ -372,25 +502,27 @@ export class SharePointClient {
 
   /**
    * Processes field values for read/write operations
+   * @param value - Original field value
+   * @param isReading - Indicates if the value is being processed for reading (true) or writing (false)
+   * @return Processed field value suitable for SharePoint operations
    */
-  private _processFieldValue(value: SPFieldValue, isReading: boolean = false): SPProcessedFieldValue {
+  private _processFieldValue(
+    value: SPFieldValue,
+    isReading: boolean = false,
+  ): SPProcessedFieldValue {
     if (value === null || value === undefined) {
       return null;
     }
 
-    // If reading and the value has SP special properties
     if (isReading && typeof value === "object" && value !== null) {
-      // Lookup field
       if ("get_lookupValue" in value) {
         return (value as SPFieldLookupValue).get_lookupValue();
       }
 
-      // User field
       if ("get_loginName" in value) {
         return (value as unknown as SPFieldUserValue).get_loginName();
       }
 
-      // Date field
       if (value instanceof Date) {
         return value.toISOString();
       }
@@ -469,7 +601,9 @@ export class SharePointClient {
     requestedFields: Array<string | keyof TFields> | null = null,
   ): SPItemData {
     // Cast requestedFields to string[] for processing
-    const fieldsToProcess = requestedFields ? (requestedFields.map(String)) : Object.keys(listConfig.fields);
+    const fieldsToProcess = requestedFields
+      ? (requestedFields.map(String))
+      : Object.keys(listConfig.fields);
     const itemData: Record<string, SPProcessedFieldValue> = {
       id: item.get_id(),
     };
@@ -485,7 +619,9 @@ export class SharePointClient {
           itemData[key] = this._processFieldValue(fieldValue, true);
         } catch (error) {
           this.tty.log(
-            `Field '${String(key)}' (${listConfig.fields[key]}) not available in item`,
+            `Field '${String(key)}' (${
+              listConfig.fields[key]
+            }) not available in item`,
             (error as Error).message,
           );
         }
@@ -557,7 +693,8 @@ export class SharePointClient {
     return new Promise((resolve, reject) => {
       try {
         const list = this.web!.get_lists().getByTitle(listConfig.name);
-        const listItemCreationInfo = new globalThis.SP.ListItemCreationInformation();
+        const listItemCreationInfo = new globalThis.SP
+          .ListItemCreationInformation();
         const newItem = list.addItem(listItemCreationInfo);
 
         Object.keys(fields).forEach((key) => {
@@ -584,7 +721,10 @@ export class SharePointClient {
             this.tty.log(`Item created in ${listConfig.name}`, result);
             resolve(result as SPResponse<SPItemData>);
           },
-          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
+          (
+            _sender: SPClientContext | undefined,
+            args: SPFailedEventArgs | undefined,
+          ) => {
             const error = {
               success: false,
               error: args?.get_message(),
@@ -685,7 +825,10 @@ export class SharePointClient {
             );
             resolve(result as SPResponse<SPItemData[]>);
           },
-          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
+          (
+            _sender: SPClientContext | undefined,
+            args: SPFailedEventArgs | undefined,
+          ) => {
             const error = {
               success: false,
               error: args?.get_message(),
@@ -922,7 +1065,9 @@ export class SharePointClient {
 
     const result = await this.read(listConfig, options);
 
-    if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+    if (
+      result.success && Array.isArray(result.data) && result.data.length > 0
+    ) {
       return {
         success: true,
         data: result.data[0],
@@ -1008,7 +1153,10 @@ export class SharePointClient {
             );
             resolve(result as SPResponse<SPItemData>);
           },
-          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
+          (
+            _sender: SPClientContext | undefined,
+            args: SPFailedEventArgs | undefined,
+          ) => {
             const error = {
               success: false,
               error: args?.get_message(),
@@ -1097,7 +1245,10 @@ export class SharePointClient {
             this.tty.log(`Item ${itemId} deleted from ${listConfig.name}`);
             resolve(result as SPResponse<SPItemData>);
           },
-          (_sender: SPClientContext | undefined, args: SPFailedEventArgs | undefined) => {
+          (
+            _sender: SPClientContext | undefined,
+            args: SPFailedEventArgs | undefined,
+          ) => {
             const error = {
               success: false,
               error: args?.get_message(),
