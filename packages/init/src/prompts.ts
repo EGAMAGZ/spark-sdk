@@ -33,6 +33,7 @@ export function printSuccess(name: string): void {
   console.log(`${MINT}Done!${RESET}\n`);
   console.log(`To get started:`);
   console.log(`  ${WHITE}cd ${name}${RESET}`);
-  console.log(`  ${WHITE}npm install${RESET}`);
-  console.log(`  ${WHITE}npm run dev${RESET}\n`);
+  console.log(`  ${WHITE}deno install${RESET}`);
+  console.log(`  ${WHITE}deno install jsr:@spark-sdk/vite-plugin${RESET}`);
+  console.log(`  ${WHITE}deno task dev${RESET}\n`);
 }
