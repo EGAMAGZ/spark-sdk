@@ -27,6 +27,9 @@
       "tags": ["recommended", "jsr", "workspace"]
     }
   },
+  "exclude": [
+    "example/"
+  ],
   "publish": {
     "exclude": [
       "tests/",
