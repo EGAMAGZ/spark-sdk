@@ -1,5 +1,5 @@
 /**
- * @module @spark-sdk/init
+ * # @spark-sdk/init
  *
  * CLI tool for scaffolding new Spark SDK projects with a pre-configured Vite + TypeScript template.
  *
@@ -64,6 +64,8 @@
  * └── pages/
  *     └── counter.html
  * ```
+ *
+ * @module
  */
 import { printLogo } from './src/logo.ts';
 import {
