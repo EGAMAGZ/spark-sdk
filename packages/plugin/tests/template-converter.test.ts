@@ -1,6 +1,6 @@
 import { convertHtmlToAspx } from '../src/template-converter.ts';
-import { expect } from "@std/expect";
-import { describe, it } from "@std/testing/bdd";
+import { expect } from '@std/expect';
+import { describe, it } from '@std/testing/bdd';
 
 describe('convertHtmlToAspx', () => {
   it('transforms valid HTML with head, body, link, script, and anchor tags', () => {

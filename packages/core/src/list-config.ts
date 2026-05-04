@@ -6,7 +6,7 @@ export type SPListConfigFields<TFields extends Record<string, unknown>> =
   & {
     [K in keyof TFields]: string;
   }
-  & { title: "Title" };
+  & { title: 'Title' };
 
 /**
  * Configuration object for a SharePoint list.
@@ -71,7 +71,7 @@ export type SPFields<TFields extends Record<string, string>> = {
     | boolean
     | string[]
     | null
-    | undefined
+    | undefined;
 };
 
 /**
@@ -111,7 +111,7 @@ export class SPListBuilder {
     return {
       name: listName,
       fields: {
-        title: "Title",
+        title: 'Title',
         ...customFields,
       },
     };
@@ -139,24 +139,24 @@ type ValidationResult =
 export function validateListConfig<TFields extends Record<string, string>>(
   list: SPListConfig<TFields>,
 ): ValidationResult {
-  if (!list.name || typeof list.name !== "string") {
+  if (!list.name || typeof list.name !== 'string') {
     return {
       isValid: false,
-      errorMessage: "ListConfig.name es requerido y debe ser un string",
+      errorMessage: 'ListConfig.name es requerido y debe ser un string',
     };
   }
 
-  if (!list.fields || typeof list.fields !== "object") {
+  if (!list.fields || typeof list.fields !== 'object') {
     return {
       isValid: false,
-      errorMessage: "ListConfig.fields es requerido y debe ser un objeto",
+      errorMessage: 'ListConfig.fields es requerido y debe ser un objeto',
     };
   }
 
   if (!list.fields.title) {
     return {
       isValid: false,
-      errorMessage: "ListConfig.fields.title es requerido",
+      errorMessage: 'ListConfig.fields.title es requerido',
     };
   }
 

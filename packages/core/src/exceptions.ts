@@ -4,6 +4,6 @@
 export class InvalidListConfigError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "InvalidListConfigError";
+    this.name = 'InvalidListConfigError';
   }
 }
