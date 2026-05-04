@@ -11,10 +11,16 @@
 
 > _Proof that SharePoint Classic and modern technologies still have a place
 > today._
+> [![JSR Scope](https://jsr.io/badges/@spark-sdk)](https://jsr.io/@spark-sdk)
+> ![GitHub License](https://img.shields.io/github/license/egamagz/spark-sdk)
+> ![GitHub Release](https://img.shields.io/github/v/release/egamagz/spark-sdk)
 
----
+## Check the [Documentation](https://jsr.io/@spark-sdk) in JSR
 
 ## Why did I create this?
+
+<details>
+<summary>Read more</summary>
 
 During my brief time working within the Microsoft 365 ecosystem, our only tools
 were the ones the platform itself provided. When the need arose to build a
@@ -36,7 +42,9 @@ These tools were developed in under 8 hours, resulting in some rough edges
 regarding logic separation and inconsistencies; however, core functionality
 remains intact. Due to personal circumstances, further development was halted. I
 aimed to finalize the project while preserving the original logic, avoiding
-changes that could compromise usability
+changes that could compromise usability.
+
+</details>
 
 ---
 
