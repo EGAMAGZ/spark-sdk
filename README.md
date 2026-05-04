@@ -1,3 +1,12 @@
+```
+    _____    
+ __|___  |__ 
+|   ___|    |
+ `-.`-.     |
+|______|  __|
+   |_____|
+```
+
 # Spark SDK
 
 > _Proof that SharePoint Classic and modern technologies still have a place
