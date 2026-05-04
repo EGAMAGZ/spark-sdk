@@ -20,7 +20,7 @@
 ## Why did I create this?
 
 <details>
-<summary>Leer más</summary>
+<summary>Read more</summary>
 
 During my brief time working within the Microsoft 365 ecosystem, our only tools
 were the ones the platform itself provided. When the need arose to build a
