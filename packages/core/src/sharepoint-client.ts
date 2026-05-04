@@ -529,6 +529,9 @@ export class SharePointClient {
 
   /**
    * Builds a CAML query
+   * @param options - Query options including fields, filter, orderBy, and rowLimit
+   * @param listConfig - List configuration to map field names
+   * @returns Constructed SPCamlQuery object ready for execution against SharePoint lists
    */
   private _buildCamlQuery<TFields extends Record<string, string>>(
     options: CamlQueryOptions<TFields>,
@@ -592,6 +595,10 @@ export class SharePointClient {
 
   /**
    * Processes item data
+   * @param item - The SPListItem returned from SharePoint
+   * @param listConfig - The list configuration to map field names
+   * @param requestedFields - Optional list of fields to process (if null, processes all fields in config)
+   * @return Processed item data with field values transformed for client use
    */
   private _processItemData<TFields extends Record<string, string>>(
     item: SPListItem,
