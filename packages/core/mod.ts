@@ -55,12 +55,14 @@
  *
  * // 4. Search for pending tasks
  * const pending = await client.search(tasks, 'status', 'Pending', 'Eq', ['title', 'dueDate']);
- * console.log(`Found ${pending.data.length} pending tasks`);
+ * if (pending.success) {
+ *   console.log(`Found ${pending.data.length} pending tasks`);
  *
- * // 5. Update and delete
- * const first = pending.data[0];
- * await client.update(tasks, first.id, { status: 'Completed' });
- * await client.delete(tasks, first.id);
+ *   // 5. Update and delete
+ *   const first = pending.data[0];
+ *   await client.update(tasks, first.id as number, { status: 'Completed' });
+ *   await client.delete(tasks, first.id as number);
+ * }
  * ```
  */
 

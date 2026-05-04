@@ -13,8 +13,8 @@ export type SPListConfigFields<TFields extends Record<string, unknown>> =
  * @typeParam TFields - Custom fields extending Record<string, string>
  * @example
  * ```ts
- * import { type SPList } from "@spark-sdk/core"
- * const taskListConfig: SPList = {
+ * import { type SPListConfig } from "@spark-sdk/core"
+ * const taskListConfig: SPListConfig<{description: string; status: string;}> = {
  *   name: "Tasks",
  *   fields: {
  *     title: "Title",
@@ -128,9 +128,9 @@ type ValidationResult =
  * @returns Indica si la configuración es válida y un mensaje de error si no lo es
  * @example
  * ```ts
- * import { SPListBuilder, validateSPList } from "@spark-sdk/core";
+ * import { SPListBuilder, validateListConfig } from "@spark-sdk/core";
  * const myList = SPListBuilder.create("My List", { customField: "CustomField" });
- * const validation = validateSPList(myList);
+ * const validation = validateListConfig(myList);
  * if (!validation.isValid) {
  *   console.error(validation.errorMessage);
  * }

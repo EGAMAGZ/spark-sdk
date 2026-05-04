@@ -656,7 +656,7 @@ export class SharePointClient {
    * @returns Operation result
    * @example
    * ```ts
-   * import { SharePointClient } from "@spark-sdk/core";
+   * import { SharePointClient, SPListBuilder } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * const taskListConfig = SPListBuilder.create("Tasks", {
    *   description: "Description",
@@ -757,7 +757,7 @@ export class SharePointClient {
    * @returns Found items
    * @example
    * ```ts
-   * import { SharePointClient } from "@spark-sdk/core";
+   * import { SharePointClient, SPListBuilder } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * const taskListConfig = SPListBuilder.create("Tasks", {
    *   description: "Description",
@@ -1033,7 +1033,7 @@ export class SharePointClient {
    * @returns Found item
    * @example
    * ```ts
-   * import { SharePointClient } from "@spark-sdk/core";
+   * import { SharePointClient, SPListBuilder } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * const taskListConfig = SPListBuilder.create("Tasks", {
    *   description: "Description",
@@ -1043,7 +1043,7 @@ export class SharePointClient {
    * try {
    *   const result = await client.getById(taskListConfig, 1);
    *   if (result.success) {
-   *     console.log("Item found:", result.item);
+   *     console.log("Item found:", result.data);
    *   }
    * } catch (error) {
    *   console.error("Error getting item:", error);
@@ -1091,7 +1091,7 @@ export class SharePointClient {
    * @returns Operation result
    * @example
    * ```ts
-   * import { SharePointClient } from "@spark-sdk/core";
+   * import { SharePointClient, SPListBuilder } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * const taskListConfig = SPListBuilder.create("Tasks", {
    *   status: "Status"
@@ -1188,7 +1188,7 @@ export class SharePointClient {
    * @returns Operation result
    * @example
    * ```ts
-   * import { SharePointClient } from "@spark-sdk/core";
+   * import { SharePointClient, SPListBuilder } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * const taskListConfig = SPListBuilder.create("Tasks", {});
    *
