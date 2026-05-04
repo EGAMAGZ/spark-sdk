@@ -15,7 +15,7 @@
     "npm:vitest": "^4.1.4"
   },
   "workspace": [
-    "packages/client",
+    "packages/core",
     "packages/init",
     "packages/plugin",
     "example/vite-ts"
