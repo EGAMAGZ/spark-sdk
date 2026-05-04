@@ -20,6 +20,9 @@ Check the [Documentation](https://jsr.io/@spark-sdk) in JSR
 
 ## Why did I create this?
 
+<details>
+<summary>Leer más</summary>
+
 During my brief time working within the Microsoft 365 ecosystem, our only tools
 were the ones the platform itself provided. When the need arose to build a
 management dashboard for a client, SharePoint Classic was the chosen route.
@@ -40,7 +43,9 @@ These tools were developed in under 8 hours, resulting in some rough edges
 regarding logic separation and inconsistencies; however, core functionality
 remains intact. Due to personal circumstances, further development was halted. I
 aimed to finalize the project while preserving the original logic, avoiding
-changes that could compromise usability
+changes that could compromise usability.
+
+</details>
 
 ---
 
