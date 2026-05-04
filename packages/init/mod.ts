@@ -65,7 +65,11 @@
  * ```
  */
 import { printLogo } from './src/logo.ts';
-import { getProjectName, promptProjectName, printSuccess } from './src/prompts.ts';
+import {
+  getProjectName,
+  printSuccess,
+  promptProjectName,
+} from './src/prompts.ts';
 import { scaffoldProject } from './src/scaffold.ts';
 
 function main() {

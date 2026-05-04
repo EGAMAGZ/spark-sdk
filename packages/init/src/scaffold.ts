@@ -1,4 +1,4 @@
-import { join, dirname } from '@std/path';
+import { dirname, join } from '@std/path';
 import { ensureDirSync } from '@std/fs/ensure-dir';
 import { existsSync } from '@std/fs/exists';
 import { MINT, RESET } from './colors.ts';

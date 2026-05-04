@@ -1,4 +1,4 @@
-import { MINT, WHITE, RESET } from './colors.ts';
+import { MINT, RESET, WHITE } from './colors.ts';
 
 export function printLogo(): void {
   const lines = [
