@@ -16,36 +16,7 @@
 ![GitHub License](https://img.shields.io/github/license/egamagz/spark-sdk)
 ![GitHub Release](https://img.shields.io/github/v/release/egamagz/spark-sdk)
 
-## Check the [Documentation](https://jsr.io/@spark-sdk) in JSR
-
-## Why did I create this?
-
-<details>
-<summary>Read more</summary>
-
-During my brief time working within the Microsoft 365 ecosystem, our only tools
-were the ones the platform itself provided. When the need arose to build a
-management dashboard for a client, SharePoint Classic was the chosen route.
-
-On my own research, I found no sufficient documentation or JavaScript packages
-that would ease development — or that I could easily adopt given the tight
-timeline and my familiarity with modern technologies. On top of that, the
-internal project example I was given as reference (built vanilla for another
-client) was significantly larger and more complex, yet riddled with bad
-practices, code smells, unmaintainable patterns, and unnecessary complexity.
-
-Faced with this, I decided to build my own alternatives using modern tooling:
-**Deno** (chiefly for its devtools and TypeScript out of the box), **Vite** (for
-local dev and building the site into a valid format), and **ECMAScript** (no
-need to explain why).
-
-These tools were developed in under 8 hours, resulting in some rough edges
-regarding logic separation and inconsistencies; however, core functionality
-remains intact. Due to personal circumstances, further development was halted. I
-aimed to finalize the project while preserving the original logic, avoiding
-changes that could compromise usability.
-
-</details>
+Check the [Documentation](https://jsr.io/@spark-sdk) in JSR
 
 ---
 
@@ -169,8 +140,36 @@ An early version of the Vite plugin for HTML → ASPX conversion:
 https://github.com/EGAMAGZ/vite-sharepoint-pages/
 ```
 
----
-
 ## License
 
 [MIT](LICENSE)
+
+---
+## Why did I create this?
+
+<details>
+<summary>Read more</summary>
+
+During my brief time working within the Microsoft 365 ecosystem, our only tools
+were the ones the platform itself provided. When the need arose to build a
+management dashboard for a client, SharePoint Classic was the chosen route.
+
+On my own research, I found no sufficient documentation or JavaScript packages
+that would ease development — or that I could easily adopt given the tight
+timeline and my familiarity with modern technologies. On top of that, the
+internal project example I was given as reference (built vanilla for another
+client) was significantly larger and more complex, yet riddled with bad
+practices, code smells, unmaintainable patterns, and unnecessary complexity.
+
+Faced with this, I decided to build my own alternatives using modern tooling:
+**Deno** (chiefly for its devtools and TypeScript out of the box), **Vite** (for
+local dev and building the site into a valid format), and **ECMAScript** (no
+need to explain why).
+
+These tools were developed in under 8 hours, resulting in some rough edges
+regarding logic separation and inconsistencies; however, core functionality
+remains intact. Due to personal circumstances, further development was halted. I
+aimed to finalize the project while preserving the original logic, avoiding
+changes that could compromise usability.
+
+</details>
