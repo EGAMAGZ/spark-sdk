@@ -590,9 +590,10 @@ export class SharePointClient {
         const orderByFieldStr = String(options.orderBy.field);
         const sharePointFieldName = listConfig.fields[orderByFieldStr] ||
           orderByFieldStr;
-        queryXml += `<OrderBy><FieldRef Name="${sharePointFieldName}" Ascending="${
-          options.orderBy.ascending !== false
-        }" /></OrderBy>`;
+        queryXml +=
+          `<OrderBy><FieldRef Name="${sharePointFieldName}" Ascending="${
+            options.orderBy.ascending !== false
+          }" /></OrderBy>`;
       }
 
       queryXml += '</Query>';
