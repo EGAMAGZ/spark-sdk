@@ -171,7 +171,7 @@ export interface SPCamlQuery {
  * Contains information required to create a new SharePoint list item.
  * Constructed via the SharePoint JS API (SP.ListItemCreationInformation).
  */
-export interface SPListItemCreationInformation {}
+export type SPListItemCreationInformation = object;
 
 /**
  * Event arguments for failed SharePoint operations, providing error message and stack trace details.
