@@ -1,11 +1,14 @@
 {
   "name": "@spark-sdk/init",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "exports": "./mod.ts",
   "license": "MIT",
   "imports": {
     "@std/cli": "jsr:@std/cli",
     "@std/path": "jsr:@std/path@1.1.4",
     "@std/fs": "jsr:@std/fs@1.0.23"
+  },
+  "publish": {
+    "exclude": ["tests/"]
   }
 }
