@@ -841,7 +841,8 @@ export class SharePointClient {
    * @returns Found items
    *
    * @example
-   * ```js
+   * ```ts
+   * import { SharePointClient, SPListBuilder } from "@spark-sdk/core";
    * const client = SharePointClient.getInstance();
    * const autoListConfig = SPListBuilder.create("Auto", {
    *   placa: "Placa",
