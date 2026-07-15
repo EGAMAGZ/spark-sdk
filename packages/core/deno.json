@@ -1,6 +1,9 @@
 {
   "name": "@spark-sdk/core",
   "exports": "./mod.ts",
-  "version": "0.1.1",
-  "license": "MIT"
+  "version": "0.1.2",
+  "license": "MIT",
+  "publish": {
+    "exclude": ["tests/"]
+  }
 }
